@@ -1,17 +1,17 @@
+import { Button } from "aspect-ui/Button";
 import React from "react";
-import { Button } from "@wordpress/components";
 
 const AccordionDashboard = ({ accordions, startCreating, startEditing }) => {
 	return (
 		<div>
 			<h2>Accordion Dashboard</h2>
-			<Button isPrimary onClick={startCreating}>
+			<Button onClick={startCreating}>
 				Create New Accordion
 			</Button>
 			<ul>
 				{accordions.map((accordion,index) => (
 					<li key={index}>
-						<Button isLink onClick={() => startEditing(accordion)}>
+						<Button onClick={() => startEditing(accordion)}>
 							{accordion.title}
 						</Button>
 					</li>

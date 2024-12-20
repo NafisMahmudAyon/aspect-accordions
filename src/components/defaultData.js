@@ -12,10 +12,11 @@ export const defaultData = {
 		headerClassName: "",
 		activeHeaderClassName: "",
 		contentClassName: "",
-    accordionClassName: "",
+		accordionClassName: "",
 	},
 	items: [
 		{
+			id: "item-1",
 			headerLabel: "Accordion 1",
 			content: "Content 1",
 			iconEnabled: true,
@@ -30,7 +31,7 @@ export const defaultData = {
 			activeLabelClassName: "",
 			activeHeaderClassName: "",
 			contentClassName: "",
-      accordionClassName: "",
+			accordionClassName: "",
 		},
 	],
 };

@@ -14,8 +14,6 @@ class aspect_accordions_post_types{
     $user_roles = $accordions_settings['user_roles'] ?? ["administrator"];
     $wp_roles = new WP_Roles();
     $roles = $wp_roles->get_names();
-		var_dump($user_roles);
-		var_dump($roles);
 
     if (!empty($roles)) {
         foreach ($roles as $index => $user_role) {

@@ -1,14 +1,14 @@
-import React from "react";
 import {
 	Accordion,
 	AccordionContent,
 	AccordionHeader,
 	AccordionItem,
 } from "aspect-ui/Accordion";
+import React from "react";
 
-const AccordionPreview = ({ globalOptions, items }) => {
+const AccordionPreview = ({ globalOptions, items, className }) => {
 	return (
-		<div className="accordion-preview">
+		<div className={`accordion-preview ${className}`}>
 			<h3>Accordion Preview</h3>
 			<Accordion
 				iconEnabled={globalOptions.iconEnabled}

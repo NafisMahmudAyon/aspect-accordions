@@ -1,10 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { Panel, Button } from "@wordpress/components";
+import {
+	Accordion,
+	AccordionContent,
+	AccordionHeader,
+	AccordionItem,
+} from "aspect-ui/Accordion";
+import { Button } from "aspect-ui/Button";
+import React, { useEffect, useState } from "react";
 import AccordionDashboard from "./AccordionDashboard";
 import AccordionGlobalOptions from "./AccordionGlobalOptions";
 import AccordionItemsEditor from "./AccordionItemsEditor";
 import AccordionPreview from "./AccordionPreview";
-import {defaultData} from "./defaultData";
+import { defaultData } from "./defaultData";
 
 const AccordionEditor = () => {
 	const [accordions, setAccordions] = useState([]);
@@ -101,7 +107,7 @@ const AccordionEditor = () => {
 		}));
 	};
 
-	console.log(options)
+	console.log(options);
 
 	return (
 		<div className="aspect-accordion-dashboard">
@@ -112,26 +118,53 @@ const AccordionEditor = () => {
 					startEditing={startEditing}
 				/>
 			) : (
-				<div className="aspect-accordion-editor">
-					<Panel>
-						<AccordionGlobalOptions
+				<>
+					<div className="aspect-accordion-editor flex gap-5 max-h-[700px] h-[70vh] relative ">
+						<aside className="w-[30%] max-w-[300px] sticky top-0">
+							<Accordion>
+								<AccordionItem
+									id="item-1"
+									className="border-primary-200 dark:border-primary-200">
+									<AccordionHeader
+										className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
+										activeHeaderClassName="border-b ">
+										<h3 className="text-h6">Accordion Editor</h3>
+									</AccordionHeader>
+									<AccordionContent className="py-3 px-3 border-0 pb-3 bg-transparent dark:bg-transparent space-y-3">
+										<AccordionGlobalOptions
+											globalOptions={options.global}
+											updateGlobalOption={updateGlobalOption}
+										/>
+									</AccordionContent>
+								</AccordionItem>
+								<AccordionItem
+									id="item-2"
+									className="border-primary-200 dark:border-primary-200">
+									<AccordionHeader
+										className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
+										activeHeaderClassName="border-b ">
+										<h3 className="text-h6">Preview</h3>
+									</AccordionHeader>
+									<AccordionContent className="py-3 px-3 border-0 pb-3 space-y-2 bg-transparent dark:bg-transparent">
+										<AccordionItemsEditor
+											items={options.items}
+											updateItem={updateItem}
+											addItem={addItem}
+										/>
+									</AccordionContent>
+								</AccordionItem>
+							</Accordion>
+						</aside>
+						<AccordionPreview
+							className="flex-1 overflow-y-scroll"
 							globalOptions={options.global}
-							updateGlobalOption={updateGlobalOption}
-						/>
-						<AccordionItemsEditor
 							items={options.items}
-							updateItem={updateItem}
-							addItem={addItem}
 						/>
-					</Panel>
-					<AccordionPreview
-						globalOptions={options.global}
-						items={options.items}
-					/>
+					</div>
 					<Button isPrimary onClick={saveAccordion}>
 						Save Accordion
 					</Button>
-				</div>
+				</>
 			)}
 		</div>
 	);

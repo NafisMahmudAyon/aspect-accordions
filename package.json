@@ -4,7 +4,8 @@
   "description": "Fully responsive and mobile ready accordion plugin for WordPress.",
   "main": "index.js",
   "scripts": {
-    "start": "wp-scripts start && npx webpack",
+    "front": "npx webpack",
+    "start": "wp-scripts start",
     "build": "wp-scripts build"
   },
   "files": [

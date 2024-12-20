@@ -1,16 +1,27 @@
 import React from "react";
 import { PanelBody, SelectControl, TextControl } from "@wordpress/components";
+import { Dropdown } from "aspect-ui";
+import Select from "./Select";
 
 const AccordionGlobalOptions = ({ globalOptions, updateGlobalOption }) => {
 	return (
-		<PanelBody title="Global Options">
-			<SelectControl
-				label="Icon Position"
-				value={globalOptions?.iconPosition}
+		<>
+			<Select
+				options={[
+					{ label: "Active", value: "active" },
+					{ label: "Inactive", value: "inactive" },
+				]}
+				label="Active Status"
+				value={globalOptions?.activeItems}
+				onChange={(value) => updateGlobalOption("activeItems", value)}
+			/>
+			<Select
 				options={[
 					{ label: "Right", value: "right" },
 					{ label: "Left", value: "left" },
 				]}
+				label="Icon Position"
+				value={globalOptions?.iconPosition}
 				onChange={(value) => updateGlobalOption("iconPosition", value)}
 			/>
 			<TextControl
@@ -18,7 +29,7 @@ const AccordionGlobalOptions = ({ globalOptions, updateGlobalOption }) => {
 				value={globalOptions?.activeIcon}
 				onChange={(value) => updateGlobalOption("activeIcon", value)}
 			/>
-		</PanelBody>
+		</>
 	);
 };
 

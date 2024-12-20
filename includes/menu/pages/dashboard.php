@@ -18,7 +18,7 @@ wp_enqueue_script('aspect-accordions-react', aspect_accordions_plugin_url . 'bui
 // Localize script with necessary data
 wp_localize_script('aspect-accordions-react', 'aspectAccordionsData', [
     'nonce' => wp_create_nonce('wp_rest'),
-    'apiUrl' => rest_url('aspect-accordions/v2/save'),
+    'apiUrl' => rest_url('aspect-accordions/v2'),
     'pluginUrl' => aspect_accordions_plugin_url,
 ]);
 ?>

@@ -26,9 +26,39 @@ class AspectAccordions
 
         // Include required files
         require_once aspect_accordions_plugin_dir . 'includes/classes/post-types.php';
+        require_once aspect_accordions_plugin_dir . 'includes/classes/shortcodes.php';
         require_once aspect_accordions_plugin_dir . 'includes/functions.php';
         require_once aspect_accordions_plugin_dir . 'includes/menu/all-menu.php';
+
+        add_action('wp_enqueue_scripts', [$this, 'aspect_accordions_enqueue_scripts']);
+
     }
+
+    public function aspect_accordions_enqueue_scripts() {
+    wp_enqueue_script(
+        'aspect-accordions-render',
+        plugins_url('/assets/js/render-accordion.bundle.js', __FILE__), // Corrected path
+        ['react', 'react-dom', 'wp-element'], // Ensure React dependencies are loaded
+        '1.0.0',
+        true
+    );
+
+    // Set the script type to "module"
+    add_filter('script_loader_tag', function ($tag, $handle, $src) {
+        if ($handle === 'aspect-accordions-render') {
+            return '<script type="module" src="' . esc_url($src) . '"></script>';
+        }
+        return $tag;
+    }, 10, 3);
+
+    // Optionally enqueue CSS for aspect-ui
+    // wp_enqueue_style(
+    //     'aspect-accordions-style',
+    //     plugins_url('/assets/css/aspect-ui.css', __FILE__), // Optional styling
+    //     [],
+    //     '1.0.0'
+    // );
+}
 }
 
 // Initialize the plugin

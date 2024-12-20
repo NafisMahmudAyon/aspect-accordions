@@ -1,22 +1,16 @@
 import React, { useState, useEffect } from "react";
-import {
-	Button,
-	Panel,
-	PanelBody,
-	TextControl,
-	TextareaControl,
-	ColorPicker,
-} from "@wordpress/components";
+import { Panel, Button } from "@wordpress/components";
+import AccordionDashboard from "./AccordionDashboard";
+import AccordionGlobalOptions from "./AccordionGlobalOptions";
+import AccordionItemsEditor from "./AccordionItemsEditor";
+import AccordionPreview from "./AccordionPreview";
+import {defaultData} from "./defaultData";
 
 const AccordionEditor = () => {
-	const [accordions, setAccordions] = useState([]); // List of accordions
-	const [currentAccordion, setCurrentAccordion] = useState(null); // Accordion being edited
-	const [options, setOptions] = useState(null); // Options for customization
+	const [accordions, setAccordions] = useState([]);
+	const [currentAccordion, setCurrentAccordion] = useState(null);
+	const [options, setOptions] = useState(null);
 
-	console.log(aspectAccordionsData);
-	console.log(accordions);
-
-	// Fetch existing accordions
 	useEffect(() => {
 		fetch(`${aspectAccordionsData.apiUrl}/list`, {
 			headers: { "X-WP-Nonce": aspectAccordionsData.nonce },
@@ -33,14 +27,7 @@ const AccordionEditor = () => {
 
 	const startCreating = () => {
 		setCurrentAccordion(null);
-		setOptions({
-			items: [{ title: "Accordion 1", content: "Content 1" }],
-			styles: {
-				backgroundColor: "#ffffff",
-				titleColor: "#000000",
-				borderColor: "#dddddd",
-			},
-		});
+		setOptions(defaultData);
 	};
 
 	const saveAccordion = async () => {
@@ -51,7 +38,7 @@ const AccordionEditor = () => {
 				"X-WP-Nonce": aspectAccordionsData.nonce,
 			},
 			body: JSON.stringify({
-				id: currentAccordion?.id || null, // Null for new accordion
+				id: currentAccordion?.id || null,
 				title: currentAccordion?.title || "New Accordion",
 				content: JSON.stringify(options),
 				status: "publish",
@@ -74,77 +61,73 @@ const AccordionEditor = () => {
 		}
 	};
 
+	const updateGlobalOption = (key, value) => {
+		setOptions((prev) => ({
+			...prev,
+			global: { ...prev.global, [key]: value },
+		}));
+	};
+
+	const updateItem = (index, key, value) => {
+		setOptions((prev) => {
+			const updatedItems = [...prev.items];
+			updatedItems[index][key] = value;
+			return { ...prev, items: updatedItems };
+		});
+	};
+
+	const addItem = () => {
+		setOptions((prev) => ({
+			...prev,
+			items: [
+				...prev.items,
+				{
+					headerLabel: "",
+					content: "",
+					iconEnabled: true,
+					iconPosition: "right",
+					iconClassName: "size-6",
+					activeIconClassName: "size-6",
+					activeIcon: "arrow-right",
+					inactiveIcon: "arrow-down",
+					disabled: false,
+					headerClassName: "",
+					labelClassName: "",
+					activeLabelClassName: "",
+					activeHeaderClassName: "",
+					contentClassName: "",
+				},
+			],
+		}));
+	};
+
+	console.log(options)
+
 	return (
 		<div className="aspect-accordion-dashboard">
 			{!options ? (
-				<div>
-					<h2>Accordion Dashboard</h2>
-					<Button isPrimary onClick={startCreating}>
-						Create New Accordion
-					</Button>
-					<ul>
-						{accordions.map((accordion) => (
-							<li key={accordion.id}>
-								<Button isLink onClick={() => startEditing(accordion)}>
-									{accordion.title}
-								</Button>
-							</li>
-						))}
-					</ul>
-				</div>
+				<AccordionDashboard
+					accordions={accordions}
+					startCreating={startCreating}
+					startEditing={startEditing}
+				/>
 			) : (
 				<div className="aspect-accordion-editor">
 					<Panel>
-						<PanelBody title="Accordion Items">
-							{options.items.map((item, index) => (
-								<div key={index} className="accordion-item">
-									<TextControl
-										label={`Title ${index + 1}`}
-										value={item.title}
-										onChange={(value) =>
-											setOptions((prev) => {
-												const updatedItems = [...prev.items];
-												updatedItems[index].title = value;
-												return { ...prev, items: updatedItems };
-											})
-										}
-									/>
-									<TextareaControl
-										label={`Content ${index + 1}`}
-										value={item.content}
-										onChange={(value) =>
-											setOptions((prev) => {
-												const updatedItems = [...prev.items];
-												updatedItems[index].content = value;
-												return { ...prev, items: updatedItems };
-											})
-										}
-									/>
-								</div>
-							))}
-							<Button
-								onClick={() =>
-									setOptions((prev) => ({
-										...prev,
-										items: [...prev.items, { title: "", content: "" }],
-									}))
-								}>
-								Add Item
-							</Button>
-						</PanelBody>
-						<PanelBody title="Styling Options">
-							<ColorPicker
-								label="Background Color"
-								color={options.styles.backgroundColor}
-								onChangeComplete={(color) =>
-									setOptions((prev) => ({
-										...prev,
-										styles: { ...prev.styles, backgroundColor: color.hex },
-									}))
-								}
-							/>
-						</PanelBody>
+						<AccordionGlobalOptions
+							globalOptions={options.global}
+							updateGlobalOption={updateGlobalOption}
+						/>
+						<AccordionItemsEditor
+							items={options.items}
+							updateItem={updateItem}
+							addItem={addItem}
+						/>
 					</Panel>
+					<AccordionPreview
+						globalOptions={options.global}
+						items={options.items}
+					/>
 					<Button isPrimary onClick={saveAccordion}>
 						Save Accordion
 					</Button>

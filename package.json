@@ -4,7 +4,7 @@
   "description": "Fully responsive and mobile ready accordion plugin for WordPress.",
   "main": "index.js",
   "scripts": {
-    "start": "wp-scripts start",
+    "start": "wp-scripts start && npx webpack",
     "build": "wp-scripts build"
   },
   "files": [
@@ -16,7 +16,13 @@
   "author": "Nafis Mahmud Ayon <nafismahmudayon@gmail.com>",
   "license": "ISC",
   "devDependencies": {
-    "@wordpress/scripts": "^27.9.0"
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0",
+    "@babel/preset-react": "^7.26.3",
+    "@wordpress/scripts": "^27.9.0",
+    "babel-loader": "^9.2.1",
+    "webpack": "^5.97.1",
+    "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

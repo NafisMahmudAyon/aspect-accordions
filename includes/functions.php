@@ -60,3 +60,30 @@ function aspect_save_accordion($request) {
 
     return get_post($post_id);
 }
+
+function aspect_accordions_enqueue_tailwind_cdn(){
+    wp_enqueue_script('tailwind-cdn', aspect_accordions_plugin_dir . '/assets/js/tailwind.js', [], '3.4.15', true);
+    $aspect_accordions_tailwind_config = "tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          primary: {
+            '50': '#edf6f7',
+            '100': '#cbe2e2',
+            '200': '#a9cdcf',
+            '300': '#87b8bc',
+            '400': '#65a3a9',
+            '500': '#438e96',
+            '600': '#38757a',
+            '700': '#2c5c60',
+            '800': '#204346',
+            '900': '#142a2c',
+            '950': '#081112'
+          },
+        }
+      }
+    }
+  };";
+
+  wp_add_inline_script('tailwind-cdn', $aspect_accordions_tailwind_config);
+}

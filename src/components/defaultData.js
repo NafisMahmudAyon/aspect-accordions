@@ -1,4 +1,4 @@
-const defaultData = {
+export const defaultData = {
 	global: {
 		activeItems: [],
 		iconEnabled: true,
@@ -12,6 +12,7 @@ const defaultData = {
 		headerClassName: "",
 		activeHeaderClassName: "",
 		contentClassName: "",
+    accordionClassName: "",
 	},
 	items: [
 		{
@@ -29,6 +30,7 @@ const defaultData = {
 			activeLabelClassName: "",
 			activeHeaderClassName: "",
 			contentClassName: "",
+      accordionClassName: "",
 		},
 	],
 };

@@ -7,10 +7,20 @@ import {
 import React from "react";
 
 const AccordionPreview = ({ globalOptions, items, className }) => {
+  console.log(globalOptions?.activeItems)
+  let activeItems = []
+if(globalOptions?.activeItems?.length >0){
+for (let i = 0; i < globalOptions?.activeItems?.length; i++) {
+  activeItems.push(`item-${globalOptions?.activeItems[i]+1}`)
+}}else{
+  activeItems = []
+}
+console.log(activeItems)
 	return (
 		<div className={`accordion-preview ${className}`}>
 			<h3>Accordion Preview</h3>
 			<Accordion
+				activeItem={activeItems}
 				iconEnabled={globalOptions.iconEnabled}
 				iconPosition={globalOptions.iconPosition}
 				className={globalOptions.headerClassName}>

@@ -72,6 +72,7 @@ const AccordionEditor = () => {
 			...prev,
 			global: { ...prev.global, [key]: value },
 		}));
+		console.log(options);
 	};
 
 	const updateItem = (index, key, value) => {
@@ -120,7 +121,7 @@ const AccordionEditor = () => {
 			) : (
 				<>
 					<div className="aspect-accordion-editor flex gap-5 max-h-[700px] h-[70vh] relative ">
-						<aside className="w-[30%] max-w-[300px] sticky top-0">
+						<aside className="w-[30%] max-w-[300px] sticky top-0 font-poppins overflow-y-auto light-scrollbar">
 							<Accordion>
 								<AccordionItem
 									id="item-1"
@@ -133,6 +134,7 @@ const AccordionEditor = () => {
 									<AccordionContent className="py-3 px-3 border-0 pb-3 bg-transparent dark:bg-transparent space-y-3">
 										<AccordionGlobalOptions
 											globalOptions={options.global}
+											itemsLength={options.items.length}
 											updateGlobalOption={updateGlobalOption}
 										/>
 									</AccordionContent>
@@ -161,9 +163,7 @@ const AccordionEditor = () => {
 							items={options.items}
 						/>
 					</div>
-					<Button isPrimary onClick={saveAccordion}>
-						Save Accordion
-					</Button>
+					<Button onClick={saveAccordion}>Save Accordion</Button>
 				</>
 			)}
 		</div>

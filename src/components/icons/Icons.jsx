@@ -3,7 +3,12 @@ import { useState, useMemo } from "react";
 import iconsListOutline from "./IconListOutline";
 import iconsListSolid from "./IconListSolid";
 
-const Icons = ({ label = "Select Icon", val, update }) => {
+const Icons = ({
+	label = "Select Icon",
+	val,
+	update,
+	updateIconType,
+}) => {
 	const [iconType, setIconType] = useState("solid");
 	const [open, setOpen] = useState(false);
 
@@ -41,10 +46,13 @@ const Icons = ({ label = "Select Icon", val, update }) => {
 
 			{open && (
 				<Popover position="bottom right">
-					<div className="p-3">
+					<div className="p-3 bg-primary-200 max-h-[300px] overflow-y-auto light-scrollbar">
 						<div className="flex items-center gap-4 mb-4">
 							<button
-								onClick={() => setIconType("solid")}
+								onClick={() => {
+									setIconType("solid");
+									updateIconType("solid");
+								}}
 								className={`px-4 py-2 rounded-md ${
 									iconType === "solid"
 										? "bg-primary-900 text-white"
@@ -54,7 +62,10 @@ const Icons = ({ label = "Select Icon", val, update }) => {
 								Solid
 							</button>
 							<button
-								onClick={() => setIconType("outline")}
+								onClick={() => {
+									setIconType("outline");
+									updateIconType("outline");
+								}}
 								className={`px-4 py-2 rounded-md ${
 									iconType === "outline"
 										? "bg-primary-900 text-white"

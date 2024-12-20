@@ -29,11 +29,11 @@ const Select = ({
 				name={name}
 				id={id}
 				className={cn(
-					"text-body1",
+					"text-body1 !text-[11px]",
 					"text-primary-900 dark:text-primary-900",
 					selectClassName
 				)}
-				onChange={onChange}
+				onChange={(e) => onChange(e.target.value)}
 				disabled={disabled}>
 				{options.map((option, i) => (
 					<option value={option.value} key={i}>

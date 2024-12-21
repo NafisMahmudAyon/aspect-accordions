@@ -3,9 +3,9 @@ import { cn } from "./utils/cn";
 
 const Select = ({
 	options,
-	className="",
-  selectClassName="",
-  labelClassName="",
+	className = "",
+	selectClassName = "",
+	labelClassName = "",
 	name = "",
 	id = "",
 	onChange,
@@ -18,7 +18,7 @@ const Select = ({
 				<label
 					htmlFor={id}
 					className={cn(
-						"break-all text-body1",
+						"break-all text-body1 !text-[11px]",
 						"text-primary-900 dark:text-primary-900",
 						labelClassName
 					)}>

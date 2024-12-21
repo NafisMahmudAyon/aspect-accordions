@@ -29,16 +29,6 @@ const AccordionGlobalOptions = ({
 					</TabItem>
 				</TabList>
 				<TabContent value="item-1" className="space-y-3 py-3 px-3">
-					<Select
-						options={[
-							{ label: "Right", value: "right" },
-							{ label: "Left", value: "left" },
-						]}
-						label="Icon Position"
-						labelClassName="text-[11px]"
-						value={globalOptions?.iconPosition}
-						onChange={(value) => updateGlobalOption("iconPosition", value)}
-					/>
 					<Switch
 						checked={globalOptions?.iconEnabled}
 						onChange={(value) => updateGlobalOption("iconEnabled", value)}
@@ -48,6 +38,16 @@ const AccordionGlobalOptions = ({
 					/>
 					{globalOptions?.iconEnabled && (
 						<>
+							<Select
+								options={[
+									{ label: "Right", value: "right" },
+									{ label: "Left", value: "left" },
+								]}
+								label="Icon Position"
+								labelClassName="text-[11px]"
+								value={globalOptions?.iconPosition}
+								onChange={(value) => updateGlobalOption("iconPosition", value)}
+							/>
 							<Icons
 								label="Active Icon"
 								val={globalOptions?.activeIcon}
@@ -81,16 +81,24 @@ const AccordionGlobalOptions = ({
 											className="w-4 h-4 !m-0"
 											checked={globalOptions?.activeItems?.includes(index)}
 											onChange={(e) => {
-												const activeItems = [...globalOptions?.activeItems];
+												const activeItems = [
+													...(globalOptions?.activeItems || []),
+												];
 												if (e.target.checked) {
+													// Add item to activeItems
 													activeItems.push(index);
 												} else {
-													activeItems.splice(activeItems.indexOf(index), 1);
+													// Remove item from activeItems
+													const itemIndex = activeItems.indexOf(index);
+													if (itemIndex > -1) activeItems.splice(itemIndex, 1);
 												}
 												updateGlobalOption("activeItems", activeItems);
 											}}
 										/>
-										<label htmlFor="" className="text-[11px] text-primary-900 dark:text-primary-900">{`Item ${
+
+										<label
+											htmlFor=""
+											className="text-[11px] text-primary-900 dark:text-primary-900">{`Item ${
 											index + 1
 										}`}</label>
 									</div>

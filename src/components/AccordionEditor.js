@@ -76,6 +76,16 @@ const AccordionEditor = () => {
 	};
 
 	const updateItem = (index, key, value) => {
+		if (index === null) {
+			// Handle entire list update (used for sorting)
+			setOptions((prev) => ({
+				...prev,
+				items: value, // Update the entire items list
+			}));
+			return;
+		}
+
+		// Update individual item
 		setOptions((prev) => {
 			const updatedItems = [...prev.items];
 			updatedItems[index][key] = value;
@@ -83,14 +93,17 @@ const AccordionEditor = () => {
 		});
 	};
 
-	const addItem = () => {
+	
+
+	const addItem = (index) => {
 		setOptions((prev) => ({
 			...prev,
 			items: [
 				...prev.items,
 				{
-					headerLabel: "",
-					content: "",
+					id: "item-" + (index + 1),
+					headerLabel: "Accordion" + (index + 1),
+					content: "Content" + (index + 1),
 					iconEnabled: true,
 					iconPosition: "right",
 					iconClassName: "size-6",
@@ -121,7 +134,7 @@ const AccordionEditor = () => {
 			) : (
 				<>
 					<div className="aspect-accordion-editor flex gap-5 max-h-[700px] h-[70vh] relative ">
-						<aside className="w-[30%] max-w-[300px] sticky top-0 font-poppins overflow-y-auto light-scrollbar">
+						<aside className="w-[30%] max-w-[300px] sticky top-0 font-poppins overflow-y-auto light-scrollbar pr-2">
 							<Accordion>
 								<AccordionItem
 									id="item-1"
@@ -129,7 +142,7 @@ const AccordionEditor = () => {
 									<AccordionHeader
 										className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
 										activeHeaderClassName="border-b ">
-										<h3 className="text-h6">Accordion Editor</h3>
+										<h3 className="text-h6 !text-[13px]">Global Options</h3>
 									</AccordionHeader>
 									<AccordionContent className="py-3 px-3 border-0 pb-3 bg-transparent dark:bg-transparent space-y-3">
 										<AccordionGlobalOptions
@@ -145,13 +158,13 @@ const AccordionEditor = () => {
 									<AccordionHeader
 										className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
 										activeHeaderClassName="border-b ">
-										<h3 className="text-h6">Preview</h3>
+										<h3 className="text-h6 !text-[13px]">Items options</h3>
 									</AccordionHeader>
 									<AccordionContent className="py-3 px-3 border-0 pb-3 space-y-2 bg-transparent dark:bg-transparent">
 										<AccordionItemsEditor
 											items={options.items}
 											updateItem={updateItem}
-											addItem={addItem}
+											addItem={() => addItem(options.items.length)}
 										/>
 									</AccordionContent>
 								</AccordionItem>
@@ -171,3 +184,6 @@ const AccordionEditor = () => {
 };
 
 export default AccordionEditor;
+
+
+

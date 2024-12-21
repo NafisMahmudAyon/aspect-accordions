@@ -35,7 +35,7 @@ class AspectAccordions
 
         add_action('wp_enqueue_scripts', [$this, 'aspect_accordions_enqueue_tailwind_cdn']);
 
-add_action('admin_enqueue_scripts', [$this, 'aspect_accordions_enqueue_tailwind_cdn']);
+// add_action('admin_enqueue_scripts', [$this, 'aspect_accordions_enqueue_tailwind_cdn']);
 
 add_action('enqueue_block_editor_assets', [$this, 'aspect_accordions_enqueue_tailwind_cdn']);
 
@@ -111,7 +111,7 @@ public function aspect_accordions_enqueue_styles() {
     // Enqueue the CSS for frontend and admin
     wp_enqueue_style(
         'aspect-accordions-style',
-        plugins_url('/build/index.css', __FILE__), // Path to your CSS file
+        plugins_url('/dist/output.css', __FILE__), // Path to your CSS file
         [],
         '1.0.0'
     );

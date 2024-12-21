@@ -5,17 +5,13 @@ import {
 	AccordionItem,
 } from "aspect-ui/Accordion";
 import React from "react";
+import IconSelector from "./icons/IconSelector";
 
 const AccordionPreview = ({ globalOptions, items, className }) => {
-  console.log(globalOptions?.activeItems)
-  let activeItems = []
-if(globalOptions?.activeItems?.length >0){
-for (let i = 0; i < globalOptions?.activeItems?.length; i++) {
-  activeItems.push(`item-${globalOptions?.activeItems[i]+1}`)
-}}else{
-  activeItems = []
-}
-console.log(activeItems)
+	// Determine active items based on global options
+	const activeItems =
+		globalOptions?.activeItems?.map((index) => `item-${index + 1}`) || [];
+
 	return (
 		<div className={`accordion-preview ${className}`}>
 			<h3>Accordion Preview</h3>
@@ -23,20 +19,58 @@ console.log(activeItems)
 				activeItem={activeItems}
 				iconEnabled={globalOptions.iconEnabled}
 				iconPosition={globalOptions.iconPosition}
-				className={globalOptions.headerClassName}>
-				{items.map((item, index) => (
-					<AccordionItem
-						key={index}
-						id={`item-${index}`}
-						disabled={item.disabled}>
-						<AccordionHeader className={item.headerClassName}>
-							{item.headerLabel}
-						</AccordionHeader>
-						<AccordionContent className={item.contentClassName}>
-							{item.content}
-						</AccordionContent>
-					</AccordionItem>
-				))}
+				className={globalOptions.accordionClassName}>
+				{items.map((item, index) => {
+					
+
+					return (
+						<AccordionItem
+							key={index}
+							id={`item-${index + 1}`}
+							disabled={item.disabled}>
+							<AccordionHeader
+								iconEnabled={item.iconEnabled}
+								iconPosition={item.iconPosition}
+								iconClassName={item.iconClassName}
+								activeIconClassName={item.activeIconClassName}
+								activeIcon={
+									item.activeIcon ? (
+										<IconSelector
+											iconType={item.activeIconType}
+											iconName={item.activeIcon}
+										/>
+									) : (
+										<IconSelector
+											iconType={globalOptions.activeIconType}
+											iconName={globalOptions.activeIcon}
+										/>
+									)
+								}
+								inactiveIcon={
+									item.inactiveIcon ? (
+										<IconSelector
+											iconType={item.inactiveIconType}
+											iconName={item.inactiveIcon}
+										/>
+									) : (
+										<IconSelector
+											iconType={globalOptions.inactiveIconType}
+											iconName={globalOptions.inactiveIcon}
+										/>
+									)
+								}
+								className={item.headerClassName}
+								labelClassName={item.labelClassName}
+								activeHeaderClassName={item.activeHeaderClassName}
+								activeLabelClassName={item.activeLabelClassName}>
+								{item.headerLabel}
+							</AccordionHeader>
+							<AccordionContent className={item.contentClassName}>
+								{item.content}
+							</AccordionContent>
+						</AccordionItem>
+					);
+				})}
 			</Accordion>
 		</div>
 	);

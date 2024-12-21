@@ -84,6 +84,7 @@ const Icons = ({
 										className="flex items-center flex-col text-center p-2 focus:outline-none"
 										onClick={() => {
 											update(icon.name);
+											updateIconType(iconType);
 											setOpen(false);
 										}}
 										aria-label={icon.name}

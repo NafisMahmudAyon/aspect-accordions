@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { tailwindCSS } from "./tailwindClasses";
+import { Popover } from "@wordpress/components";
 
 const TailwindInput = ({ update, val, label = "Add Classes" }) => {
 	const [inputValue, setInputValue] = useState(val || "");
@@ -147,27 +148,31 @@ const TailwindInput = ({ update, val, label = "Add Classes" }) => {
 				aria-owns="suggestion-list"
 			/>
 			{showSuggestions && (
-				<ul
-					id="suggestion-list"
-					className="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border rounded shadow-md z-10"
-					role="listbox"
-					tabIndex="-1">
-					{suggestions.map((suggestion, index) => (
-						<li
-							key={index}
-							ref={index === activeSuggestionIndex ? activeSuggestionRef : null}
-							onClick={() => handleSuggestionClick(suggestion)}
-							className={`p-2 cursor-pointer text-[11px] ${
-								index === activeSuggestionIndex
-									? "bg-blue-100"
-									: "hover:bg-gray-100"
-							}`}
-							aria-selected={index === activeSuggestionIndex}
-							role="option">
-							{suggestion}
-						</li>
-					))}
-				</ul>
+				<Popover position="bottom right" className="min-w-[200px] light-scrollbar ">
+					<ul
+						id="suggestion-list"
+						className="absolute left-0 right-0 mt-1 max-h-60 overflow-y-auto bg-white border rounded shadow-md z-10"
+						role="listbox"
+						tabIndex="-1">
+						{suggestions.map((suggestion, index) => (
+							<li
+								key={index}
+								ref={
+									index === activeSuggestionIndex ? activeSuggestionRef : null
+								}
+								onClick={() => handleSuggestionClick(suggestion)}
+								className={`p-2 cursor-pointer text-[11px] ${
+									index === activeSuggestionIndex
+										? "bg-blue-100"
+										: "hover:bg-gray-100"
+								}`}
+								aria-selected={index === activeSuggestionIndex}
+								role="option">
+								{suggestion}
+							</li>
+						))}
+					</ul>
+				</Popover>
 			)}
 		</div>
 	);

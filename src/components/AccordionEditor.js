@@ -142,12 +142,19 @@ const AccordionEditor = () => {
 		}
 
 		// Update individual item
+		// setOptions((prev) => {
+		// 	const updatedItems = [...prev.items];
+		// 	updatedItems[index][key] = value;
+		// 	return { ...prev, items: updatedItems };
+		// });
+
 		setOptions((prev) => {
-			const updatedItems = [...prev.items];
-			updatedItems[index][key] = value;
-			return { ...prev, items: updatedItems };
+			const updatedItems = [...prev.items]; // Create a shallow copy of the items array
+			updatedItems[index] = { ...updatedItems[index], [key]: value }; // Create a new object for the updated item
+			return { ...prev, items: updatedItems }; // Return the updated options
 		});
 	};
+	console.log("Updated items:", options?.items);
 
 	const cancelEditing = () => {
 		// Reset the states to exit the editing mode

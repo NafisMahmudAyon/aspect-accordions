@@ -4,15 +4,19 @@
   "description": "Fully responsive and mobile ready accordion plugin for WordPress.",
   "main": "index.js",
   "scripts": {
-    "front": "npx webpack",
+    "front": "npx webpack --config webpack.config.js",
+    "front:build": "esbuild assets/js/render-accordion.js --bundle --outfile=assets/js/render-accordion.bundle.js --minify",
     "start": "wp-scripts start",
     "watch": "npx tailwindcss -i ./src/index.css -o ./dist/output.css --watch",
+    "zip": "wp-scripts plugin-zip",
     "build": "wp-scripts build"
   },
   "files": [
     "build",
     "aspect-accordions.php",
-    "includes"
+    "includes",
+    "assets",
+    "dist"
   ],
   "keywords": [],
   "author": "Nafis Mahmud Ayon <nafismahmudayon@gmail.com>",
@@ -23,12 +27,14 @@
     "@babel/preset-react": "^7.26.3",
     "@wordpress/scripts": "^27.9.0",
     "babel-loader": "^9.2.1",
+    "esbuild": "^0.24.2",
     "webpack": "^5.97.1",
+    "webpack-bundle-analyzer": "^4.10.2",
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "aspect-ui": "^0.0.55",
+    "aspect-ui": "^0.0.57",
     "autoprefixer": "^10.4.19",
     "clsx": "^2.1.1",
     "postcss": "^8.4.38",

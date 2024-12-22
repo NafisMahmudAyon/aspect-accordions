@@ -12,7 +12,8 @@ const AccordionPreview = ({ globalOptions, items, className }) => {
 	const activeItems =
 		globalOptions?.activeItems?.map((index) => `item-${index + 1}`) || [];
 
-		console.log(globalOptions.activeIcon, items[0].activeIcon);
+		console.log("Preview props:", { globalOptions, items });
+		console.log("first",items[0].headerClassName);
 
 	return (
 		<div className={`accordion-preview ${className}`}>
@@ -21,7 +22,8 @@ const AccordionPreview = ({ globalOptions, items, className }) => {
 				activeItem={activeItems}
 				iconEnabled={globalOptions.iconEnabled}
 				iconPosition={globalOptions.iconPosition}
-				className={globalOptions.accordionClassName}>
+				className={globalOptions.accordionClassName}
+				reset={true}>
 				{items.map((item, index) => {
 					
 

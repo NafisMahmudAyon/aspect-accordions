@@ -6,10 +6,18 @@ module.exports = {
 		path: path.resolve(__dirname, "assets/js"), // Output directory
 		filename: "render-accordion.bundle.js", // Output file
 	},
+	resolve: {
+		extensions: [".js", ".jsx"],
+		alias: {
+			"@src": path.resolve(__dirname, "src"),
+			"@components": path.resolve(__dirname, "src/components"),
+			"@icons": path.resolve(__dirname, "src/components/icons"),
+		},
+	},
 	module: {
 		rules: [
 			{
-				test: /\.js$/,
+				test: /\.(js|jsx)$/,
 				exclude: /node_modules/,
 				use: {
 					loader: "babel-loader",

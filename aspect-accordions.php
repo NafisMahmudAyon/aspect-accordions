@@ -32,93 +32,83 @@ class AspectAccordions
         require_once aspect_accordions_plugin_dir . 'includes/menu/all-menu.php';
 
         add_action('wp_enqueue_scripts', [$this, 'aspect_accordions_enqueue_scripts']);
-        
-
         add_action('wp_enqueue_scripts', [$this, 'aspect_accordions_enqueue_tailwind_cdn']);
-
-// add_action('admin_enqueue_scripts', [$this, 'aspect_accordions_enqueue_tailwind_cdn']);
-
-add_action('enqueue_block_editor_assets', [$this, 'aspect_accordions_enqueue_tailwind_cdn']);
-
-// Enqueue for frontend
-add_action('wp_enqueue_scripts', [$this,'aspect_accordions_enqueue_styles']);
-
-// Enqueue for admin dashboard
-add_action('admin_enqueue_scripts', [$this, 'aspect_accordions_enqueue_styles']);
-
-// Enqueue for block editor
-add_action('enqueue_block_editor_assets',[$this,'aspect_accordions_enqueue_styles'] );
-
+        add_action('enqueue_block_editor_assets', [$this, 'aspect_accordions_enqueue_tailwind_cdn']);
+        add_action('wp_enqueue_scripts', [$this, 'aspect_accordions_enqueue_styles']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
     }
 
-    public function aspect_accordions_enqueue_scripts() {
-    wp_enqueue_script(
-        'aspect-accordions-render',
-        plugins_url('/assets/js/render-accordion.bundle.js', __FILE__), // Corrected path
-        ['react', 'react-dom', 'wp-element'], // Ensure React dependencies are loaded
-        '1.0.0',
-        true
-    );
+    public function aspect_accordions_enqueue_scripts()
+    {
+        wp_enqueue_script(
+            'aspect-accordions-render',
+            plugins_url('/assets/js/render-accordion.bundle.js', __FILE__),
+            ['react', 'react-dom', 'wp-element'],
+            '1.0.0',
+            true
+        );
 
-    // Set the script type to "module"
-    add_filter('script_loader_tag', function ($tag, $handle, $src) {
-        if ($handle === 'aspect-accordions-render') {
-            return '<script type="module" src="' . esc_url($src) . '"></script>';
-        }
-        return $tag;
-    }, 10, 3);
-
-    // Optionally enqueue CSS for aspect-ui
-    // wp_enqueue_style(
-    //     'aspect-accordions-style',
-    //     plugins_url('/assets/css/aspect-ui.css', __FILE__), // Optional styling
-    //     [],
-    //     '1.0.0'
-    // );
-}
-
-public function aspect_accordions_enqueue_tailwind_cdn(){
-    wp_enqueue_script('tailwind-cdn', plugins_url('/assets/js/tailwind.js', __FILE__),[], '3.4.15', true);
-    $aspect_accordions_tailwind_config = "tailwind.config = {
-    theme: {
-      extend: {
-        colors: {
-          primary: {
-            '50': '#edf6f7',
-            '100': '#cbe2e2',
-            '200': '#a9cdcf',
-            '300': '#87b8bc',
-            '400': '#65a3a9',
-            '500': '#438e96',
-            '600': '#38757a',
-            '700': '#2c5c60',
-            '800': '#204346',
-            '900': '#142a2c',
-            '950': '#081112'
-          },
-        }
-      }
+        add_filter('script_loader_tag', function ($tag, $handle, $src) {
+            if ($handle === 'aspect-accordions-render') {
+                return '<script type="module" src="' . esc_url($src) . '"></script>';
+            }
+            return $tag;
+        }, 10, 3);
     }
-  };";
 
-  wp_add_inline_script('tailwind-cdn', $aspect_accordions_tailwind_config);
-}
+    public function aspect_accordions_enqueue_tailwind_cdn()
+    {
+        wp_enqueue_script(
+            'tailwind-cdn',
+            plugins_url('/assets/js/tailwind.js', __FILE__),
+            [],
+            '3.4.15',
+            true
+        );
 
+        $aspect_accordions_tailwind_config = "tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            '50': '#edf6f7',
+                            '100': '#cbe2e2',
+                            '200': '#a9cdcf',
+                            '300': '#87b8bc',
+                            '400': '#65a3a9',
+                            '500': '#438e96',
+                            '600': '#38757a',
+                            '700': '#2c5c60',
+                            '800': '#204346',
+                            '900': '#142a2c',
+                            '950': '#081112'
+                        },
+                    }
+                }
+            }
+        };";
 
+        wp_add_inline_script('tailwind-cdn', $aspect_accordions_tailwind_config);
+    }
 
+    public function aspect_accordions_enqueue_styles()
+    {
+        wp_enqueue_style(
+            'aspect-accordions-style',
+            plugins_url('/dist/output.css', __FILE__),
+            [],
+            '1.0.0'
+        );
+    }
 
-// Enqueue CSS for frontend, admin, and block editor
-public function aspect_accordions_enqueue_styles() {
-    // Enqueue the CSS for frontend and admin
-    wp_enqueue_style(
-        'aspect-accordions-style',
-        plugins_url('/dist/output.css', __FILE__), // Path to your CSS file
-        [],
-        '1.0.0'
-    );
-}
-
-
+    public function enqueue_admin_scripts($hook_suffix)
+    {
+        // Load scripts only on the Aspect Accordions admin page
+        if ($hook_suffix === 'toplevel_page_aspect-accordions') {
+            $this->aspect_accordions_enqueue_tailwind_cdn();
+            $this->aspect_accordions_enqueue_styles();
+        }
+    }
 }
 
 // Initialize the plugin

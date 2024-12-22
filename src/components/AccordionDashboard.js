@@ -30,14 +30,14 @@ const AccordionDashboard = ({
 				isPrimary>
 				Create New Accordion
 			</Button>
-			<ul className="space-y-4">
+			<ul className="">
 				{accordions.map((accordion, index) => {
 					var content = JSON.parse(accordion.content);
 					var globalOptions = content.global;
 					var items = content.items;
 					var shortCode = `[aspect_accordions id="${accordion.id}"]`;
 					return (
-						<li key={index} className="p-4 bg-gray-100 rounded-md shadow-md">
+						<li key={index} className="p-4 bg-gray-100 border-b border-b-gray-200 mb-0 hover:bg-gray-200 transition-colors duration-200 ease-in-out">
 							<div className="flex justify-between items-center">
 								<p className="font-bold text-sm">{accordion.title}</p>
 								<div className="flex gap-2">

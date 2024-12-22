@@ -16,6 +16,7 @@ import React from "react";
 import { ReactSortable } from "react-sortablejs";
 import Icons from "./icons/Icons";
 import Select from "./Select";
+import TailwindInput from "./TailwindInput";
 
 const AccordionItemsEditor = ({ items, updateItem, addItem }) => {
 	console.log(items);
@@ -65,19 +66,19 @@ const AccordionItemsEditor = ({ items, updateItem, addItem }) => {
 									activeHeaderClassName="border-b"
 									labelClassName="flex items-center gap-2">
 									<span className="flex items-center gap-2 w-max">
-										<Button
-											icon={<ChevronUpDownIcon className="size-5" />}
+										<span
 											title="Drag to reorder"
 											aria-label="Drag to reorder"
-											className="handle bg-primary-200 hover:bg-primary-200 dark:bg-primary-200 dark:hover:bg-primary-200 px-1 py-1 text-primary-900 dark:text-primary-900 hover:text-primary-900 dark:hover:text-primary-900"
-										/>
-										<Button
-											icon={<DocumentDuplicateIcon className="size-5" />}
-											onClick={() => copyItem(index)}
-											className="bg-primary-200 hover:bg-primary-200 dark:bg-primary-200 dark:hover:bg-primary-200 px-1 py-1 text-primary-900 dark:text-primary-900 hover:text-primary-900 dark:hover:text-primary-900"
+											className="handle bg-primary-200 hover:bg-primary-200 dark:bg-primary-200 dark:hover:bg-primary-200 px-1 py-1 text-primary-900 dark:text-primary-900 hover:text-primary-900 dark:hover:text-primary-900 rounded-md cursor-move">
+											<ChevronUpDownIcon className="size-5" />
+										</span>
+										<span
 											title={`Copy Item ${index + 1}`}
 											aria-label={`Copy Item ${index + 1}`}
-										/>
+											onClick={() => copyItem(index)}
+											className="bg-primary-200 hover:bg-primary-200 dark:bg-primary-200 dark:hover:bg-primary-200 px-1 py-1 text-primary-900 dark:text-primary-900 hover:text-primary-900 dark:hover:text-primary-900 rounded-md cursor-pointer">
+											<DocumentDuplicateIcon className="size-5" />
+										</span>
 									</span>
 									Accordion Item {index + 1}
 								</AccordionHeader>
@@ -111,6 +112,15 @@ const AccordionItemsEditor = ({ items, updateItem, addItem }) => {
 												onChange={(value) =>
 													updateItem(index, "content", value)
 												}
+											/>
+											<Switch
+												checked={item?.disabled}
+												onChange={(value) =>
+													updateItem(index, "disabled", value)
+												}
+												label="Disabled"
+												labelClassName="text-[11px] ml-0 text-primary-900 dark:text-primary-900"
+												className="flex-row-reverse justify-between w-full"
 											/>
 											<Switch
 												checked={item?.iconEnabled}
@@ -158,9 +168,43 @@ const AccordionItemsEditor = ({ items, updateItem, addItem }) => {
 												</>
 											)}
 										</TabContent>
-										<TabContent
-											value="item-2"
-											className="space-y-3"></TabContent>
+										<TabContent value="item-2" className="space-y-3">
+											<TailwindInput
+												val={item?.headerClassName}
+												update={(value) =>
+													updateItem(index, "headerClassName", value)
+												}
+												label="Header Class Name"
+											/>
+											<TailwindInput
+												val={item?.activeHeaderClassName}
+												update={(value) =>
+													updateItem(index, "activeHeaderClassName", value)
+												}
+												label="Active Header Class Name"
+											/>
+											<TailwindInput
+												val={item?.labelClassName}
+												update={(value) =>
+													updateItem(index, "labelClassName", value)
+												}
+												label="Label Class Name"
+											/>
+											<TailwindInput
+												val={item?.activeLabelClassName}
+												update={(value) =>
+													updateItem(index, "activeLabelClassName", value)
+												}
+												label="Active Label Class Name"
+											/>
+											<TailwindInput
+												val={item?.contentClassName}
+												update={(value) =>
+													updateItem(index, "contentClassName", value)
+												}
+												label="Content Class Name"
+											/>
+										</TabContent>
 									</Tabs>
 								</AccordionContent>
 							</AccordionItem>

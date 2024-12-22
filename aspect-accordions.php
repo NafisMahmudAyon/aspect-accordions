@@ -28,6 +28,7 @@ class AspectAccordions
         require_once aspect_accordions_plugin_dir . 'includes/classes/post-types.php';
         require_once aspect_accordions_plugin_dir . 'includes/classes/shortcodes.php';
         require_once aspect_accordions_plugin_dir . 'includes/functions.php';
+        require_once aspect_accordions_plugin_dir . 'includes/functions-rest.php';
         require_once aspect_accordions_plugin_dir . 'includes/menu/all-menu.php';
 
         add_action('wp_enqueue_scripts', [$this, 'aspect_accordions_enqueue_scripts']);

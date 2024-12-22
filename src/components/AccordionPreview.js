@@ -12,6 +12,8 @@ const AccordionPreview = ({ globalOptions, items, className }) => {
 	const activeItems =
 		globalOptions?.activeItems?.map((index) => `item-${index + 1}`) || [];
 
+		console.log(globalOptions.activeIcon, items[0].activeIcon);
+
 	return (
 		<div className={`accordion-preview ${className}`}>
 			<h3>Accordion Preview</h3>

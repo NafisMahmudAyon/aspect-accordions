@@ -1,3 +1,4 @@
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import {
 	Accordion,
 	AccordionContent,
@@ -16,6 +17,8 @@ const AccordionEditor = () => {
 	const [accordions, setAccordions] = useState([]);
 	const [currentAccordion, setCurrentAccordion] = useState(null);
 	const [options, setOptions] = useState(null);
+	const [title, setTitle] = useState(""); // State for the accordion title
+	const [saveLoading, setSaveLoading] = useState(false);
 
 	useEffect(() => {
 		fetch(`${aspectAccordionsData.apiUrl}/list`, {
@@ -28,15 +31,18 @@ const AccordionEditor = () => {
 
 	const startEditing = (accordion) => {
 		setCurrentAccordion(accordion);
+		setTitle(accordion.title); // Set the existing title for editing
 		setOptions(JSON.parse(accordion.content));
 	};
 
 	const startCreating = () => {
 		setCurrentAccordion(null);
+		setTitle("New Accordion"); // Default title for new accordion
 		setOptions(defaultData);
 	};
 
 	const saveAccordion = async () => {
+		setSaveLoading(true);
 		const response = await fetch(`${aspectAccordionsData.apiUrl}/save`, {
 			method: "POST",
 			headers: {
@@ -45,25 +51,76 @@ const AccordionEditor = () => {
 			},
 			body: JSON.stringify({
 				id: currentAccordion?.id || null,
-				title: currentAccordion?.title || "New Accordion",
+				title, // Use the title from state
 				content: JSON.stringify(options),
 				status: "publish",
 			}),
 		});
 
 		if (response.ok) {
-			const newAccordion = await response.json();
-			setAccordions((prev) =>
-				currentAccordion
-					? prev.map((acc) =>
-							acc.id === currentAccordion.id ? newAccordion : acc
-					  )
-					: [...prev, newAccordion]
-			);
+			await fetchUpdatedAccordionList(); // Fetch the updated list after saving
 			setCurrentAccordion(null);
 			setOptions(null);
+			setTitle(""); // Clear the title field
 		} else {
 			console.error("Error saving accordion");
+		}
+		setSaveLoading(false);
+	};
+
+	const startDeleting = async (id) => {
+		if (window.confirm("Are you sure you want to delete this accordion?")) {
+			try {
+				await fetch(`${aspectAccordionsData.apiUrl}/delete/${id}`, {
+					method: "DELETE",
+					headers: { "X-WP-Nonce": aspectAccordionsData.nonce },
+				});
+				await fetchUpdatedAccordionList(); // Refresh the list
+			} catch (err) {
+				console.error("Error deleting accordion:", err);
+			}
+		}
+	};
+
+	const startCopying = async (accordion) => {
+		try {
+			const response = await fetch(`${aspectAccordionsData.apiUrl}/save`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"X-WP-Nonce": aspectAccordionsData.nonce,
+				},
+				body: JSON.stringify({
+					id: null, // New accordion
+					title: `${accordion.title} (Copy)`,
+					content: accordion.content,
+					status: "publish",
+				}),
+			});
+			if (response.ok) {
+				await fetchUpdatedAccordionList(); // Refresh the list
+			}
+		} catch (err) {
+			console.error("Error copying accordion:", err);
+		}
+	};
+
+	// const startQuickView = (accordion) => {
+	// 	alert(
+	// 		`Quick View:\n\nTitle: ${accordion.title}\nContent: ${accordion.content}`
+	// 	);
+	// };
+
+	// Fetch the updated list of accordions
+	const fetchUpdatedAccordionList = async () => {
+		try {
+			const response = await fetch(`${aspectAccordionsData.apiUrl}/list`, {
+				headers: { "X-WP-Nonce": aspectAccordionsData.nonce },
+			});
+			const data = await response.json();
+			setAccordions(data);
+		} catch (err) {
+			console.error("Error fetching accordion list:", err);
 		}
 	};
 
@@ -72,7 +129,6 @@ const AccordionEditor = () => {
 			...prev,
 			global: { ...prev.global, [key]: value },
 		}));
-		console.log(options);
 	};
 
 	const updateItem = (index, key, value) => {
@@ -93,7 +149,12 @@ const AccordionEditor = () => {
 		});
 	};
 
-	
+	const cancelEditing = () => {
+		// Reset the states to exit the editing mode
+		setCurrentAccordion(null);
+		setOptions(null);
+		setTitle("");
+	};
 
 	const addItem = (index) => {
 		setOptions((prev) => ({
@@ -108,8 +169,10 @@ const AccordionEditor = () => {
 					iconPosition: "right",
 					iconClassName: "size-6",
 					activeIconClassName: "size-6",
-					activeIcon: "arrow-right",
-					inactiveIcon: "arrow-down",
+					activeIcon: "",
+					activeIconType: "outline",
+					inactiveIcon: "",
+					inactiveIconType: "outline",
 					disabled: false,
 					headerClassName: "",
 					labelClassName: "",
@@ -120,9 +183,6 @@ const AccordionEditor = () => {
 			],
 		}));
 	};
-
-	console.log(options);
-
 	return (
 		<div className="aspect-accordion-dashboard">
 			{!options ? (
@@ -130,18 +190,34 @@ const AccordionEditor = () => {
 					accordions={accordions}
 					startCreating={startCreating}
 					startEditing={startEditing}
+					startDeleting={startDeleting}
+					startCopying={startCopying}
+					// startQuickView={startQuickView}
 				/>
 			) : (
 				<>
-					<div className="aspect-accordion-editor flex gap-5 max-h-[700px] h-[70vh] relative ">
+					<div className="aspect-accordion-editor flex gap-5 max-h-[700px] h-[70vh] relative">
 						<aside className="w-[30%] max-w-[300px] sticky top-0 font-poppins overflow-y-auto light-scrollbar pr-2">
+							{/* Title Input */}
+							<div className="mb-4">
+								<label className="block text-sm font-medium mb-1">
+									Accordion Title
+								</label>
+								<input
+									type="text"
+									value={title}
+									onChange={(e) => setTitle(e.target.value)}
+									className="w-full px-3 py-2 border rounded-md text-sm"
+									placeholder="Enter accordion title"
+								/>
+							</div>
 							<Accordion>
 								<AccordionItem
 									id="item-1"
 									className="border-primary-200 dark:border-primary-200">
 									<AccordionHeader
 										className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
-										activeHeaderClassName="border-b ">
+										activeHeaderClassName="border-b">
 										<h3 className="text-h6 !text-[13px]">Global Options</h3>
 									</AccordionHeader>
 									<AccordionContent className="py-3 px-3 border-0 pb-3 bg-transparent dark:bg-transparent space-y-3">
@@ -157,8 +233,8 @@ const AccordionEditor = () => {
 									className="border-primary-200 dark:border-primary-200">
 									<AccordionHeader
 										className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
-										activeHeaderClassName="border-b ">
-										<h3 className="text-h6 !text-[13px]">Items options</h3>
+										activeHeaderClassName="border-b">
+										<h3 className="text-h6 !text-[13px]">Items Options</h3>
 									</AccordionHeader>
 									<AccordionContent className="py-3 px-3 border-0 pb-3 space-y-2 bg-transparent dark:bg-transparent">
 										<AccordionItemsEditor
@@ -176,7 +252,19 @@ const AccordionEditor = () => {
 							items={options.items}
 						/>
 					</div>
-					<Button onClick={saveAccordion}>Save Accordion</Button>
+					<div className="flex items-center gap-2 mt-4">
+						<Button
+							icon={<CheckCircleIcon className="size-5" />}
+							loading={saveLoading}
+							onClick={saveAccordion}>
+							Save Accordion
+						</Button>
+						<Button
+							icon={<XCircleIcon className="size-5" />}
+							onClick={cancelEditing}>
+							Cancel Editing
+						</Button>
+					</div>
 				</>
 			)}
 		</div>
@@ -184,6 +272,4 @@ const AccordionEditor = () => {
 };
 
 export default AccordionEditor;
-
-
 

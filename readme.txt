@@ -1,4 +1,4 @@
-=== Aspect Accordions - With Tailwind Style ===
+=== Aspect Accordions - With Tailwind ===
 	Contributors: nafismahmudayon
 	Tags: accordion, FAQ
 	Requires at least: 3.8

@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Aspect Accordions
+Plugin Name: Aspect Accordions - With Tailwind
 Plugin URI: https://nafisbd.com
 Description: Fully responsive and mobile ready accordion plugin for WordPress.
 Version: 0.0.1
@@ -31,33 +31,62 @@ class AspectAccordions
         require_once aspect_accordions_plugin_dir . 'includes/functions-rest.php';
         require_once aspect_accordions_plugin_dir . 'includes/menu/all-menu.php';
 
-        add_action('wp_enqueue_scripts', [$this, 'aspect_accordions_enqueue_scripts']);
-        add_action('wp_enqueue_scripts', [$this, 'aspect_accordions_enqueue_tailwind_cdn']);
-        add_action('enqueue_block_editor_assets', [$this, 'aspect_accordions_enqueue_tailwind_cdn']);
-        add_action('wp_enqueue_scripts', [$this, 'aspect_accordions_enqueue_styles']);
-        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_scripts']);
+        // Enqueue actions
+        add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_assets']);
+        add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
     }
 
-    public function aspect_accordions_enqueue_scripts()
+    /**
+     * Enqueue frontend scripts and styles
+     */
+    public function enqueue_frontend_assets()
     {
+        // Ensure the Tailwind CDN is enqueued
+        $this->enqueue_tailwind_cdn();
+
+        // Enqueue Render Script
         wp_enqueue_script(
             'aspect-accordions-render',
             plugins_url('/assets/js/render-accordion.bundle.js', __FILE__),
-            ['react', 'react-dom', 'wp-element'],
-            '1.0.0',
+            ['react', 'react-dom', 'wp-element'], // Dependencies
+            aspect_accordions_version,
             true
         );
 
-        add_filter('script_loader_tag', function ($tag, $handle, $src) {
-            if ($handle === 'aspect-accordions-render') {
-                return '<script type="module" src="' . esc_url($src) . '"></script>';
-            }
-            return $tag;
-        }, 10, 3);
+        // Enqueue Styles
+        // wp_enqueue_style(
+        //     'aspect-accordions-style',
+        //     plugins_url('/dist/output.css', __FILE__),
+        //     [],
+        //     aspect_accordions_version
+        // );
     }
 
-    public function aspect_accordions_enqueue_tailwind_cdn()
+    /**
+     * Enqueue admin scripts and styles for the Aspect Accordions admin page
+     */
+    public function enqueue_admin_assets($hook_suffix)
     {
+        // Load assets only on the Aspect Accordions admin page
+        if ($hook_suffix === 'toplevel_page_aspect-accordions') {
+            $this->enqueue_tailwind_cdn();
+
+            // Enqueue Admin Styles
+            wp_enqueue_style(
+                'aspect-accordions-admin-style',
+                plugins_url('/dist/output.css', __FILE__),
+                [],
+                aspect_accordions_version
+            );
+        }
+    }
+
+    /**
+     * Enqueue Tailwind CDN and its inline configuration
+     */
+    public function enqueue_tailwind_cdn()
+    {
+
         wp_enqueue_script(
             'tailwind-cdn',
             plugins_url('/assets/js/tailwind.js', __FILE__),
@@ -66,7 +95,7 @@ class AspectAccordions
             true
         );
 
-        $aspect_accordions_tailwind_config = "tailwind.config = {
+        $tailwind_config = "tailwind.config = {
             theme: {
                 extend: {
                     colors: {
@@ -88,26 +117,7 @@ class AspectAccordions
             }
         };";
 
-        wp_add_inline_script('tailwind-cdn', $aspect_accordions_tailwind_config);
-    }
-
-    public function aspect_accordions_enqueue_styles()
-    {
-        wp_enqueue_style(
-            'aspect-accordions-style',
-            plugins_url('/dist/output.css', __FILE__),
-            [],
-            '1.0.0'
-        );
-    }
-
-    public function enqueue_admin_scripts($hook_suffix)
-    {
-        // Load scripts only on the Aspect Accordions admin page
-        if ($hook_suffix === 'toplevel_page_aspect-accordions') {
-            $this->aspect_accordions_enqueue_tailwind_cdn();
-            $this->aspect_accordions_enqueue_styles();
-        }
+        wp_add_inline_script('tailwind-cdn', $tailwind_config);
     }
 }
 

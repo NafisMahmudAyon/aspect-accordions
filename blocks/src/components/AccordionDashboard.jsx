@@ -31,13 +31,9 @@ const AccordionDashboard = ({
 			</Button>
 			<ul className="">
 				{accordions.map((accordion, index) => {
-					console.log(accordion)
-					// var content = JSON.parse(accordion?.content);
-					var content = accordion?.content;
-					console.log(content)
-					console.log("parsed: ",JSON.parse(content));
-					var globalOptions = content?.global;
-					var items = content?.items;
+					var content = JSON.parse(accordion.content);
+					var globalOptions = content.global;
+					var items = content.items;
 					var shortCode = `[aspect_accordions id="${accordion.id}"]`;
 					return (
 						<li key={index} className="p-4 bg-gray-100 border-b border-b-gray-200 mb-0 hover:bg-gray-200 transition-colors duration-200 ease-in-out">

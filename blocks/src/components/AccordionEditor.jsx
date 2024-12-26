@@ -27,12 +27,10 @@ const AccordionEditor = () => {
 			headers: { "X-WP-Nonce": aspectAccordionsData?.nonce },
 		})
 			.then((res) => res.json())
-			.then((data) => {setAccordions(data);console.log(data)})
+			.then((data) => setAccordions(data))
 			.catch((err) => console.error(err));
 	}, []);
 
-
-	
 	const startEditing = (accordion) => {
 		setCurrentAccordion(accordion);
 		setTitle(accordion.title); // Set the existing title for editing

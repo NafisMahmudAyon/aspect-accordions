@@ -33,10 +33,29 @@ class aspect_accordions_shortcodes {
             return '<p>Invalid accordion data.</p>';
         }
 
-        // Prepare the HTML output
+        // Prepare static HTML output
         ob_start();
         ?>
 <div id="aspect-accordion-<?php echo esc_attr($post_id); ?>" class="aspect-accordion">
+  <div class="aspect-accordion-wrapper">
+    <?php foreach ($accordion_data['items'] as $index => $item) : ?>
+    <div class="aspect-accordion-item" id="item-<?php echo esc_attr($index + 1); ?>">
+      <div class="aspect-accordion-header <?php echo esc_attr($item['headerClassName']); ?>">
+        <span class="aspect-accordion-label">
+          <?php echo esc_html($item['headerLabel']); ?>
+        </span>
+        <?php if (!empty($item['iconEnabled'])) : ?>
+        <span class="aspect-accordion-icon">
+          <i class="<?php echo esc_attr($item['iconClassName']); ?>"></i>
+        </span>
+        <?php endif; ?>
+      </div>
+      <div class="aspect-accordion-content <?php echo esc_attr($item['contentClassName']); ?>">
+        <?php echo wp_kses_post($item['content']); ?>
+      </div>
+    </div>
+    <?php endforeach; ?>
+  </div>
   <script type="application/json" class="aspect-accordion-data">
   <?php echo wp_json_encode($accordion_data); ?>
   </script>

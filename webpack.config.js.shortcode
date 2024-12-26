@@ -1,10 +1,10 @@
 const path = require("path");
 
 module.exports = {
-	entry: "./assets/js/render-accordion.js", // Entry point
+	entry: "./assets/js/shortcode.js", // Entry point
 	output: {
 		path: path.resolve(__dirname, "assets/js"), // Output directory
-		filename: "render-accordion.bundle.js", // Output file
+		filename: "shortcode.bundle.js", // Output file
 	},
 	resolve: {
 		extensions: [".js", ".jsx"],

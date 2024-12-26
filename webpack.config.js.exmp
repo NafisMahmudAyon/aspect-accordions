@@ -1,0 +1,43 @@
+const defaultConfig = require("@wordpress/scripts/config/webpack.config");
+const path = require("path");
+
+module.exports = {
+	...defaultConfig,
+	entry: {
+		blocks: path.resolve(__dirname, "src/index.js"), // Main entry point for blocks
+		// shortcode: path.resolve(__dirname, "src/shortcode.js"), // Entry for shortcode scripts
+		// admin: path.resolve(__dirname, "src/admin.js"), // Entry for admin dashboard scripts
+		renderAccordion: "./assets/js/render-accordion.js", // Additional entry for render-accordion
+	},
+	output: {
+		...defaultConfig.output,
+		filename: "[name].bundle.js", // Dynamically name files based on entry points
+		path: path.resolve(__dirname, "build"), // Output directory
+	},
+	resolve: {
+		...defaultConfig.resolve,
+		extensions: [".js", ".jsx"],
+		alias: {
+			...defaultConfig.resolve?.alias,
+			"@src": path.resolve(__dirname, "src"),
+			"@components": path.resolve(__dirname, "src/components"),
+			"@icons": path.resolve(__dirname, "src/components/icons"),
+		},
+	},
+	module: {
+		rules: [
+			...(defaultConfig.module?.rules || []),
+			{
+				test: /\.(js|jsx)$/,
+				exclude: /node_modules/,
+				use: {
+					loader: "babel-loader",
+					options: {
+						presets: ["@babel/preset-env", "@babel/preset-react"],
+					},
+				},
+			},
+		],
+	},
+	mode: "production", // Use production mode for optimized builds
+};

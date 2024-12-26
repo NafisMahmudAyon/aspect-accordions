@@ -34,6 +34,10 @@ class AspectAccordions
         // Enqueue actions
         add_action('wp_enqueue_scripts', [$this, 'enqueue_frontend_assets']);
         add_action('admin_enqueue_scripts', [$this, 'enqueue_admin_assets']);
+
+        add_action('enqueue_block_assets', [$this, 'enqueue_tailwind_cdn']);
+
+        // add_action('init', [$this, 'aspectBlocks_register_aspect_blocks']);
     }
 
     /**
@@ -47,7 +51,7 @@ class AspectAccordions
         // Enqueue Render Script
         wp_enqueue_script(
             'aspect-accordions-render',
-            plugins_url('/assets/js/render-accordion.bundle.js', __FILE__),
+            plugins_url('/assets/js/shortcode.bundle.js', __FILE__),
             ['react', 'react-dom', 'wp-element'], // Dependencies
             aspect_accordions_version,
             true
@@ -74,7 +78,7 @@ class AspectAccordions
             // Enqueue Admin Styles
             wp_enqueue_style(
                 'aspect-accordions-admin-style',
-                plugins_url('/dist/output.css', __FILE__),
+                plugins_url('/build/index.css', __FILE__),
                 [],
                 aspect_accordions_version
             );
@@ -119,6 +123,14 @@ class AspectAccordions
 
         wp_add_inline_script('tailwind-cdn', $tailwind_config);
     }
+
+    public function aspectBlocks_register_aspect_blocks()
+{
+    register_block_type(__DIR__ . '/build/blocks/accordion');
+  register_block_type(__DIR__ . '/build/blocks/accordion-item');
+}
+
+
 }
 
 // Initialize the plugin

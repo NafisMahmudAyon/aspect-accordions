@@ -16,6 +16,14 @@ if (!defined('ABSPATH')) exit;
 // Enqueue React and our custom scripts
 wp_enqueue_script('aspect-accordions-react', aspect_accordions_plugin_url . 'build/index.js', ['wp-element', 'wp-api', 'wp-components'], aspect_accordions_version, true);
 
+
+// add_filter('script_loader_tag', function ($tag, $handle, $src) {
+//     if ('aspect-accordions-react' === $handle) {
+//         $tag = '<script type="module" src="' . esc_url($src) . '"></script>';
+//     }
+//     return $tag;
+// }, 10, 3);
+
 // Localize script with necessary data
 wp_localize_script('aspect-accordions-react', 'aspectAccordionsData', [
     'nonce' => wp_create_nonce('wp_rest'),

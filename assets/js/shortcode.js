@@ -1,3 +1,4 @@
+import IconSelector from "@icons/IconSelector";
 import {
 	Accordion,
 	AccordionContent,
@@ -6,35 +7,28 @@ import {
 } from "aspect-ui/Accordion";
 import React from "react";
 import ReactDOM from "react-dom";
-import IconSelector from "@icons/IconSelector";
+import RichTextViewer from "@components/RichTextViewer";
 
 document.addEventListener("DOMContentLoaded", () => {
 	const accordions = document.querySelectorAll(".aspect-accordion");
 
 	accordions.forEach((container) => {
-		const dataElement = container.querySelector(".aspect-accordion-data");
-		console.log(dataElement);
-		if (!dataElement) return;
-
 		try {
-			const accordionData = JSON.parse(dataElement.textContent);
-			console.log(accordionData);
+			const dataElement = container.querySelector(".aspect-accordion-data");
+			if (!dataElement) return;
 
-			let activeItems = [];
-			if (accordionData?.global?.activeItems?.length > 0) {
-				for (let i = 0; i < accordionData?.global?.activeItems?.length; i++) {
-					activeItems.push(`item-${accordionData?.global?.activeItems[i] + 1}`);
-				}
-			} else {
-				activeItems = [];
-			}
+			// Parse accordionData from the JSON inside .aspect-accordion-data
+			const accordionData = JSON.parse(dataElement.textContent);
 
 			ReactDOM.render(
 				<Accordion
-					activeItem={activeItems}
+					activeItem={accordionData?.global?.activeItems?.map(
+						(index) => `item-${index + 1}`
+					)}
 					iconEnabled={accordionData?.global?.iconEnabled ?? true}
 					iconPosition={accordionData.global?.iconPosition}
 					className={accordionData.global?.accordionClassName}
+					multiple={accordionData?.global?.multiple ?? false}
 					reset={true}>
 					{accordionData.items.map((item, index) => (
 						<AccordionItem
@@ -79,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
 								{item.headerLabel}
 							</AccordionHeader>
 							<AccordionContent className={item.contentClassName}>
-								{item.content}
+								<RichTextViewer savedContent={item.content} />
 							</AccordionContent>
 						</AccordionItem>
 					))}
@@ -87,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
 				container
 			);
 		} catch (error) {
-			console.error("Failed to render accordion:", error);
+			console.error("Accordion rendering failed:", error);
 		}
 	});
 });

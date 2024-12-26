@@ -1,6 +1,6 @@
-import { render } from "@wordpress/element";
+import ReactDOM from "react-dom";
 import React from "react";
 import AccordionEditor from "./components/AccordionEditor";
-import "./index.css";
+// import "./index.css";
 
-render(<AccordionEditor />, document.getElementById("aspect-accordions-app"));
+ReactDOM.render(<AccordionEditor />, document.getElementById("aspect-accordions-app"));

@@ -21,7 +21,7 @@ export const defaultData = {
 		{
 			id: "item-1",
 			headerLabel: "Accordion 1",
-			content: "",
+			content: "Content 1",
 			iconEnabled: true,
 			iconPosition: "right",
 			iconClassName: "size-6",

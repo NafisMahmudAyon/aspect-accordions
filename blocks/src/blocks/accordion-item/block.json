@@ -1,0 +1,38 @@
+{
+  "$schema": "https://schemas.wp.org/trunk/block.json",
+  "apiVersion": 3,
+  "name": "aspect-accordions/accordion-item",
+  "version": "0.1.0",
+  "title": "Accordion Item",
+  "category": "aspect-accordions",
+  "icon": "welcome-learn-more",
+  "parent": [
+    "aspect-accordions/accordion"
+  ],
+  "attributes": {
+    "accordionItem": {
+      "type": "object",
+      "default": {
+        "headerLabel": "Accordion 1",
+        "content": "Content 1",
+        "iconEnabled": true,
+        "iconPosition": "right",
+        "iconClassName": "size-6",
+        "activeIconClassName": "size-6",
+        "activeIcon": "",
+        "activeIconType": "",
+        "inactiveIcon": "",
+        "inactiveIconType": "",
+        "disabled": false,
+        "headerClassName": "",
+        "labelClassName": "",
+        "activeLabelClassName": "",
+        "activeHeaderClassName": "",
+        "contentClassName": "",
+        "accordionClassName": ""
+      }
+    }
+  },
+  "editorScript": "file:./index.js",
+  "render": "file:./render.php"
+}

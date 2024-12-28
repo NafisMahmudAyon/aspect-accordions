@@ -24,24 +24,29 @@ import iconsListSolid from "../../components/icons/IconListSolid";
 // import Style from "../../components/Style";
 import { cn } from "../../components/utils/cn";
 import metadata from "./block.json";
+import MarkdownEditor from "../../../../src/components/MarkdownEditor";
+import { Switch } from "aspect-ui/Switch";
+import Select from "../../components/Select";
+import TailwindInput from "../../components/TailwindInput";
+import Icons from "../../components/icons/Icons";
 
 registerBlockType(metadata.name, { edit: EditComponent, save: SaveComponent });
 
 function EditComponent(props) {
 	const { attributes, setAttributes } = props;
-	const { accordionItem } = attributes;
-	const [open, setOpen] = useState(accordionItem.open || true);
+	const { items } = attributes;
+	const [open, setOpen] = useState(items.open || true);
 
 	// Common Helper Functions
 	const updateAttribute = (key, value) => {
 		setAttributes({
-			accordionItem: { ...accordionItem, [key]: value },
+			items: { ...items, [key]: value },
 		});
 	};
 
 	const updateClass = (key, value) => {
 		setAttributes({
-			accordionItem: { ...accordionItem, [key]: value },
+			items: { ...items, [key]: value },
 		});
 	};
 
@@ -51,16 +56,19 @@ function EditComponent(props) {
 		return IconComponent ? <IconComponent /> : null;
 	};
 
+	const updateItem = (key, value) => {
+		setAttributes({
+			items: { ...items, [key]: value },
+		});
+	};
+
 	// Block Props
 	const blockProps = useBlockProps({
 		className: cn(
 			"aspect-blocks aspect-blocks-accordion-item-editor",
-			accordionItem.class?.sm,
-			accordionItem.class?.md,
-			accordionItem.class?.desktop,
-			accordionItem.class?.custom,
+			items.accordionClassName
 		),
-		...(accordionItem.disabled && { disabled: true }),
+		...(items.disabled && { disabled: true }),
 	});
 
 	// Tag Options
@@ -80,186 +88,135 @@ function EditComponent(props) {
 		<>
 			<InspectorControls>
 				<div className="aspect-blocks-editor-settings mb-3">
-					<Accordion iconPosition="right">
-						{/* Accordion Item Settings */}
-						<AccordionItem
-							id="accordion-item"
-							className="border-primary-200 dark:border-primary-200"
-						>
+					<Accordion className="mb-3">
+						<AccordionItem className="accordion-item" id={"item-1"}>
 							<AccordionHeader
 								className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
-								activeHeaderClassName="border-b "
-							>
+								activeHeaderClassName="border-b"
+								labelClassName="flex items-center gap-2">
 								Accordion Item
 							</AccordionHeader>
-							<AccordionContent className="py-3 px-3 border-0 pb-3 bg-transparent dark:bg-transparent">
+							<AccordionContent className="py-3 px-3 border-0 pb-3 bg-transparent dark:bg-transparent space-y-3">
 								<Tabs defaultActive="item-1">
-									<TabList>
-										<TabItem value="item-1">Options</TabItem>
-										<TabItem value="item-2">Style</TabItem>
+									<TabList className="px-3">
+										<TabItem
+											value="item-1"
+											activeClassName="!bg-primary-900 !text-white dark:!bg-primary-900 dark:!text-white"
+											className="px-4 py-2 rounded-md bg-gray-200 text-gray-600 dark:bg-gray-200 dark:text-gray-600">
+											Options
+										</TabItem>
+										<TabItem
+											value="item-2"
+											activeClassName="!bg-primary-900 !text-white dark:!bg-primary-900 dark:!text-white"
+											className="px-4 py-2 rounded-md bg-gray-200 text-gray-600 dark:bg-gray-200 dark:text-gray-600">
+											Style
+										</TabItem>
 									</TabList>
 									<TabContent value="item-1" className="space-y-3">
-										{/* <InputData
-											val={accordionItem.id}
-											update={(e) => updateAttribute("id", e.target.value)}
-										/> */}
-										{/* <SwitchData
-											label="Open Onload"
-											val={accordionItem.open}
-											update={(e) => updateAttribute("open", e)}
-										/>
-										<SwitchData
+										{/* <SlateEditor
+												value={items.headerLabel}
+												onChange={(value) =>
+													updateItem(index, "headerLabel", value)
+												}
+												placeholder={`Header Label ${index + 1}`}
+											/> */}
+										{/* <DraftEditor
+												value={items.content || "{}"} // Ensure that content is a valid JSON object or an empty object
+												onChange={(value) => {
+													try {
+														// Parse and ensure the value is valid before updating
+														const parsedValue = JSON.parse(value);
+														updateItem(
+															index,
+															"content",
+															JSON.stringify(parsedValue)
+														); // Store the content as JSON string
+													} catch (error) {
+														console.error("Invalid editor content:", error);
+														// Optional: You can set the content to an empty object if the content is invalid
+														updateItem(index, "content", "{}");
+													}
+												}}
+												placeholder={`Content ${index + 1}`}
+											/> */}
+
+										<Switch
+											checked={items?.disabled}
+											onChange={(value) => updateItem("disabled", value)}
 											label="Disabled"
-											val={accordionItem.disabled}
-											update={(e) => updateAttribute("disabled", e)}
+											labelClassName="text-[11px] ml-0 text-primary-900 dark:text-primary-900"
+											className="flex-row-reverse justify-between w-full"
 										/>
-										<DropdownData
-											label="Tag"
-											options={tagNameOptions}
-											value={accordionItem.tag}
-											update={(e) => updateAttribute("tag", e.target.value)}
-										/> */}
+										<Switch
+											checked={items?.iconEnabled}
+											onChange={(value) => updateItem("iconEnabled", value)}
+											label="Icon Enable"
+											labelClassName="text-[11px] ml-0 text-primary-900 dark:text-primary-900"
+											className="flex-row-reverse justify-between w-full"
+										/>
+										{items?.iconEnabled && (
+											<>
+												<Select
+													options={[
+														{ label: "Right", value: "right" },
+														{ label: "Left", value: "left" },
+													]}
+													label="Icon Position"
+													labelClassName="text-[11px]"
+													value={items?.iconPosition}
+													onChange={(value) =>
+														updateItem("iconPosition", value)
+													}
+												/>
+												<Icons
+													label="Active Icon"
+													val={items?.activeIcon}
+													update={(value) => updateItem("activeIcon", value)}
+													updateIconType={(value) =>
+														updateItem("activeIconType", value)
+													}
+												/>
+												<Icons
+													label="Inactive Icon"
+													val={items?.inactiveIcon}
+													update={(value) => updateItem("inactiveIcon", value)}
+													updateIconType={(value) =>
+														updateItem("inactiveIconType", value)
+													}
+												/>
+											</>
+										)}
 									</TabContent>
-									<TabContent value="item-2">
-										{/* <Style
-											update={(e) => updateClass("class", e)}
-											val={accordionItem.class}
-										/> */}
-									</TabContent>
-								</Tabs>
-							</AccordionContent>
-						</AccordionItem>
-						<AccordionItem
-							id="accordion-item-header"
-							className="border-primary-200 dark:border-primary-200"
-						>
-							<AccordionHeader
-								className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
-								activeHeaderClassName="border-b "
-							>
-								Accordion Item Header
-							</AccordionHeader>
-							<AccordionContent className="py-3 px-3 border-0 pb-3 space-y-2 bg-transparent dark:bg-transparent">
-								<Tabs defaultActive="item-1">
-									<TabList>
-										<TabItem value="item-1">Options</TabItem>
-										<TabItem value="item-2">Style</TabItem>
-									</TabList>
-									<TabContent value="item-1">
-										{/* <DropdownData
-											label="Header Tag"
-											options={tagNameOptions}
-											value={accordionItem.headerTag}
-											update={(e) =>
-												updateAttribute("headerTag", e.target.value)
+									<TabContent value="item-2" className="space-y-3">
+										<TailwindInput
+											val={items?.headerClassName}
+											update={(value) => updateItem("headerClassName", value)}
+											label="Header Class Name"
+										/>
+										<TailwindInput
+											val={items?.activeHeaderClassName}
+											update={(value) =>
+												updateItem("activeHeaderClassName", value)
 											}
-										/> */}
-									</TabContent>
-									<TabContent value="item-2">
-										{/* <Style
-											update={(e) => updateClass("accordionHeaderClass", e)}
-											val={accordionItem.accordionHeaderClass}
-										/> */}
-									</TabContent>
-								</Tabs>
-							</AccordionContent>
-						</AccordionItem>
-						<AccordionItem
-							id="accordion-item-header-title"
-							className="border-primary-200 dark:border-primary-200"
-						>
-							<AccordionHeader
-								className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
-								activeHeaderClassName="border-b "
-							>
-								Header Title
-							</AccordionHeader>
-							<AccordionContent className="py-3 px-3 border-0 pb-3 space-y-2 bg-transparent dark:bg-transparent">
-								<Tabs defaultActive="item-1">
-									<TabList>
-										<TabItem value="item-1">Options</TabItem>
-										<TabItem value="item-2">Style</TabItem>
-									</TabList>
-									<TabContent value="item-1"></TabContent>
-									<TabContent value="item-2">
-										{/* <Style
-											update={(e) =>
-												updateClass("accordionHeaderTitleClass", e)
+											label="Active Header Class Name"
+										/>
+										<TailwindInput
+											val={items?.labelClassName}
+											update={(value) => updateItem("labelClassName", value)}
+											label="Label Class Name"
+										/>
+										<TailwindInput
+											val={items?.activeLabelClassName}
+											update={(value) =>
+												updateItem("activeLabelClassName", value)
 											}
-											val={accordionItem.accordionHeaderTitleClass}
-										/> */}
-									</TabContent>
-								</Tabs>
-							</AccordionContent>
-						</AccordionItem>
-						<AccordionItem
-							id="accordion-item-content"
-							className="border-primary-200 dark:border-primary-200"
-						>
-							<AccordionHeader
-								className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
-								activeHeaderClassName="border-b "
-							>
-								Accordion Item Content
-							</AccordionHeader>
-							<AccordionContent className="py-3 px-3 border-0 pb-3 space-y-2 bg-transparent dark:bg-transparent">
-								<Tabs defaultActive="item-1">
-									<TabList>
-										<TabItem value="item-1">Options</TabItem>
-										<TabItem value="item-2">Style</TabItem>
-									</TabList>
-									<TabContent value="item-1">
-										{/* <DropdownData
-											label="Content Tag"
-											options={tagNameOptions}
-											value={accordionItem.contentTag}
-											update={(e) =>
-												updateAttribute("contentTag", e.target.value)
-											}
-										/> */}
-									</TabContent>
-									<TabContent value="item-2">
-										{/* <Style
-											update={(e) => updateClass("accordionContentClass", e)}
-											val={accordionItem.accordionContentClass}
-										/> */}
-									</TabContent>
-								</Tabs>
-							</AccordionContent>
-						</AccordionItem>
-						<AccordionItem
-							id="accordion-item-header-icon"
-							className="border-primary-200 dark:border-primary-200"
-						>
-							<AccordionHeader
-								className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
-								activeHeaderClassName="border-b "
-							>
-								Header Icon
-							</AccordionHeader>
-							<AccordionContent className="py-3 px-3 border-0 pb-3 space-y-2 bg-transparent dark:bg-transparent">
-								<Tabs defaultActive="item-1">
-									<TabList>
-										<TabItem value="item-1">Options</TabItem>
-										<TabItem value="item-2">Style</TabItem>
-									</TabList>
-									<TabContent value="item-1">
-										{/* <Icons
-											label="Open Icon"
-											val={accordionItem.openIcon}
-											update={(e) => updateAttribute("openIcon", e)}
-										/> */}
-										{/* <Icons
-											label="Close Icon"
-											val={accordionItem.closeIcon}
-											update={(e) => updateAttribute("closeIcon", e)}
-										/> */}
-									</TabContent>
-									<TabContent value="item-2">
-										{/* <Style
-											update={(e) => updateClass("accordionIconClass", e)}
-											val={accordionItem.accordionIconClass}
-										/> */}
+											label="Active Label Class Name"
+										/>
+										<TailwindInput
+											val={items?.contentClassName}
+											update={(value) => updateItem("contentClassName", value)}
+											label="Content Class Name"
+										/>
 									</TabContent>
 								</Tabs>
 							</AccordionContent>
@@ -267,74 +224,53 @@ function EditComponent(props) {
 					</Accordion>
 				</div>
 			</InspectorControls>
-			{/* {JSON.stringify(accordionItem)} */}
+			{/* {JSON.stringify(items)} */}
 			{/* Block Output */}
-			<accordionItem.tag {...blockProps}>
-				<accordionItem.headerTag
+			<div {...blockProps}>
+				<div
 					onClick={() => setOpen(!open)}
 					className={cn(
 						"aspect-blocks-accordion-header",
-						accordionItem.accordionHeaderClass?.sm,
-						accordionItem.accordionHeaderClass?.md,
-						accordionItem.accordionHeaderClass?.desktop,
-						accordionItem.accordionHeaderClass?.custom,
-					)}
-				>
+						items.headerClassName
+					)}>
 					<RichText
 						className={cn(
 							"aspect-blocks-accordion-header-title",
-							accordionItem.accordionHeaderTitleClass?.sm,
-							accordionItem.accordionHeaderTitleClass?.md,
-							accordionItem.accordionHeaderTitleClass?.desktop,
-							accordionItem.accordionHeaderTitleClass?.custom,
+							items.labelClassName
 						)}
 						tagName="span"
-						value={accordionItem.headerTitle}
+						value={items.headerLabel}
 						allowedFormats={["core/bold", "core/italic", "core/link"]}
-						onChange={(value) => updateAttribute("headerTitle", value)}
+						onChange={(value) => updateAttribute("headerLabel", value)}
 						placeholder="Start Writing..."
 					/>
 					<span
-						className={cn(
-							"aspect-blocks-accordion-icon",
-							accordionItem.accordionIconClass?.sm,
-							accordionItem.accordionIconClass?.md,
-							accordionItem.accordionIconClass?.desktop,
-							accordionItem.accordionIconClass?.custom,
-						)}
-					>
+						className={cn("aspect-blocks-accordion-icon", items.iconClassName)}>
 						{open
-							? renderIcon(accordionItem.openIcon, accordionItem.openIconType)
-							: renderIcon(
-									accordionItem.closeIcon,
-									accordionItem.closeIconType,
-							  )}
+							? renderIcon(items.openIcon, items.openIconType)
+							: renderIcon(items.closeIcon, items.closeIconType)}
 					</span>
-				</accordionItem.headerTag>
+				</div>
 
 				{/* Accordion Content */}
-				{/* {open && ( */}
-				<accordionItem.contentTag
-					className={cn(
-						"aspect-blocks-accordion-content-editor transition-[max-height] duration-300 ease-in-out",
-						accordionItem.accordionContentClass?.sm,
-						accordionItem.accordionContentClass?.md,
-						accordionItem.accordionContentClass?.desktop,
-						accordionItem.accordionContentClass?.custom,
-					)}
-					style={{
-						display: open ? "block" : "none",
-						maxHeight: open ? "max-content" : "0",
-						overflow: "hidden",
-						transition: "max-height 0.3s ease-in-out",
-					}}
-				>
-					<InnerBlocks
-						renderAppender={() => <InnerBlocks.ButtonBlockAppender />}
-					/>
-				</accordionItem.contentTag>
-				{/* )} */}
-			</accordionItem.tag>
+				{open && (
+					<div
+						className={cn(
+							"aspect-blocks-accordion-content-editor transition-[max-height] duration-300 ease-in-out",
+							items.contentClassName
+						)}
+						style={{
+							display: open ? "block" : "none",
+							maxHeight: open ? "max-content" : "0",
+							overflow: "hidden",
+							transition: "max-height 0.3s ease-in-out",
+						}}>
+						<InnerBlocks
+							renderAppender={() => <InnerBlocks.ButtonBlockAppender />}
+						/>
+					</div>
+				)}
+			</div>
 		</>
 	);
 }
@@ -342,3 +278,4 @@ function EditComponent(props) {
 function SaveComponent() {
 	return <InnerBlocks.Content />;
 }
+

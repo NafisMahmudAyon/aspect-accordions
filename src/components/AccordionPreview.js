@@ -4,16 +4,25 @@ import {
 	AccordionHeader,
 	AccordionItem,
 } from "aspect-ui/Accordion";
-import React from "react";
+import qs from "qs";
+import React, { useState } from "react";
 import IconSelector from "./icons/IconSelector";
+import MarkdownEditor from "./MarkdownEditor";
+import { Switch } from "aspect-ui";
 
-const AccordionPreview = ({ globalOptions, items, className }) => {
+const AccordionPreview = ({ globalOptions, items, className, updateItem, quickView=false }) => {
+	console.log("Preview props:", { globalOptions, items });
+	console.log("first", items[0].headerClassName);
+
 	// Determine active items based on global options
 	const activeItems =
 		globalOptions?.activeItems?.map((index) => `item-${index + 1}`) || [];
 
-		console.log("Preview props:", { globalOptions, items });
-		console.log("first",items[0].headerClassName);
+	const [preview, setPreview] = useState(false);
+	console.log(items.disabled)
+
+	// console.log("Preview props:", { globalOptions, items });
+	// console.log("first",items[0].headerClassName);
 
 	return (
 		<div className={`accordion-preview ${className}`}>
@@ -25,13 +34,11 @@ const AccordionPreview = ({ globalOptions, items, className }) => {
 				className={globalOptions.accordionClassName}
 				reset={true}>
 				{items.map((item, index) => {
-					
-
 					return (
 						<AccordionItem
 							key={index}
 							id={`item-${index + 1}`}
-							disabled={item.disabled}>
+							disabled={item.disabled==="true"?true:false}>
 							<AccordionHeader
 								iconEnabled={item.iconEnabled}
 								iconPosition={item.iconPosition}
@@ -67,11 +74,46 @@ const AccordionPreview = ({ globalOptions, items, className }) => {
 								labelClassName={item.labelClassName}
 								activeHeaderClassName={item.activeHeaderClassName}
 								activeLabelClassName={item.activeLabelClassName}>
-								{/* {item.headerLabel} */}label
+								{item.headerLabel}
 							</AccordionHeader>
-							<AccordionContent className={item.contentClassName}>
-								{/* {item.content} */}content
-							</AccordionContent>
+
+							{/* <AccordionContent
+								className={item.contentClassName}
+								dangerouslySetInnerHTML={{
+									__html: qs.unescape(item.content),
+								}}
+							/> */}
+
+							{!quickView && (
+								<AccordionContent className={item.contentClassName}>
+									<Switch
+										checked={preview}
+										onChange={(value) => setPreview(value)}
+										label="Preview?"
+										labelClassName="text-[11px] ml-0 text-primary-900 dark:text-primary-900"
+										className="flex-row-reverse justify-between w-full"
+									/>
+									{preview ? (
+										<div dangerouslySetInnerHTML={{ __html: item.content }} />
+									) : (
+										<MarkdownEditor
+											value={item.content || ""}
+											onChange={(value) => updateItem(index, "content", value)}
+											placeholder="Start typing..."
+										/>
+									)}
+								</AccordionContent>
+							)}
+							{quickView && (
+								<AccordionContent
+									className={item.contentClassName}
+									dangerouslySetInnerHTML={{ __html: item.content }}
+								/>
+							)}
+							{/* <AccordionContent
+								className={item.contentClassName}
+								dangerouslySetInnerHTML={{ __html: item.content }}
+							/> */}
 						</AccordionItem>
 					);
 				})}

@@ -11,6 +11,7 @@ import { Modal, ModalAction, ModalContent } from "aspect-ui/Modal";
 import { Tooltip, TooltipAction, TooltipContent } from "aspect-ui/Tooltip";
 import React from "react";
 import AccordionPreview from "./AccordionPreview";
+import qs from "qs";
 
 const AccordionDashboard = ({
 	accordions,
@@ -31,16 +32,24 @@ const AccordionDashboard = ({
 			</Button>
 			<ul className="">
 				{accordions.map((accordion, index) => {
-					console.log(accordion)
-					// var content = JSON.parse(accordion?.content);
-					var content = accordion?.content;
+					console.log(accordion);
+					var parsedData = qs.parse(accordion?.content, { decode: true });
+					const content = Object.keys(parsedData).reduce((acc, key) => {
+						const cleanedKey = key.replace(/^amp;/, ""); // Remove the 'amp;' prefix
+						acc[cleanedKey] = parsedData[key];
+						return acc;
+					}, {});
+					// var content = accordion?.content;
 					console.log(content)
-					console.log("parsed: ",JSON.parse(content));
+					// console.log("parsed: ",JSON.parse(content));
 					var globalOptions = content?.global;
 					var items = content?.items;
+					console.log("items: ", items[0].disabled);
 					var shortCode = `[aspect_accordions id="${accordion.id}"]`;
 					return (
-						<li key={index} className="p-4 bg-gray-100 border-b border-b-gray-200 mb-0 hover:bg-gray-200 transition-colors duration-200 ease-in-out">
+						<li
+							key={index}
+							className="p-4 bg-gray-100 border-b border-b-gray-200 mb-0 hover:bg-gray-200 transition-colors duration-200 ease-in-out">
 							<div className="flex justify-between items-center">
 								<p className="font-bold text-sm">{accordion.title}</p>
 								<div className="flex gap-2">
@@ -102,10 +111,11 @@ const AccordionDashboard = ({
 												<ModalAction>
 													<EyeIcon className="size-5" />
 												</ModalAction>
-												<ModalContent className="p-4 min-w-[600px]">
+												<ModalContent className="p-4 min-w-[600px] max-h-[600px] overflow-y-auto light-scrollbar">
 													<AccordionPreview
 														globalOptions={globalOptions}
 														items={items}
+														quickView={true}
 													/>
 												</ModalContent>
 											</Modal>

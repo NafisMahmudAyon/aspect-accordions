@@ -21,7 +21,7 @@ import TailwindInput from "./TailwindInput";
 import MarkdownEditor from "./MarkdownEditor";
 
 const AccordionItemsEditor = ({ items, updateItem, addItem }) => {
-	console.log(items);
+	// console.log(items);
 
 	// Function to handle sorting and update item IDs
 	const handleSort = (newList) => {

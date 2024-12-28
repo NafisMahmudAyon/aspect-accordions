@@ -37,7 +37,7 @@ class AspectAccordions
 
         add_action('enqueue_block_assets', [$this, 'enqueue_tailwind_cdn']);
 
-        // add_action('init', [$this, 'aspectBlocks_register_aspect_blocks']);
+        add_action('init', [$this, 'aspectAccordions_register_blocks']);
     }
 
     /**
@@ -56,6 +56,13 @@ class AspectAccordions
             aspect_accordions_version,
             true
         );
+
+        // wp_enqueue_style(
+        //         'aspect-accordions-admin-style',
+        //         plugins_url('/build/index.css', __FILE__),
+        //         [],
+        //         aspect_accordions_version
+        //     );
 
         // Enqueue Styles
         // wp_enqueue_style(
@@ -124,10 +131,10 @@ class AspectAccordions
         wp_add_inline_script('tailwind-cdn', $tailwind_config);
     }
 
-    public function aspectBlocks_register_aspect_blocks()
+    public function aspectAccordions_register_blocks()
 {
     register_block_type(__DIR__ . '/build/blocks/accordion');
-  register_block_type(__DIR__ . '/build/blocks/accordion-item');
+    register_block_type(__DIR__ . '/build/blocks/accordion-item');
 }
 
 

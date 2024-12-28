@@ -1,5 +1,4 @@
-// import "../../style.css";
-
+// import required dependencies
 import {
 	InnerBlocks,
 	InspectorControls,
@@ -8,50 +7,43 @@ import {
 } from "@wordpress/block-editor";
 import { registerBlockType } from "@wordpress/blocks";
 import metadata from "./block.json";
-// import TailwindInput from "../../components/TailwindInput";
 import { TabContent, TabItem, TabList, Tabs } from "aspect-ui/Tabs";
-// import DropdownData from "../../components/block-components/dropdown-data";
-// import InputData from "../../components/block-components/input-data";
-// import SwitchData from "../../components/block-components/switch-data";
-// import Style from "../../components/Style";
 import { cn } from "../../components/utils/cn";
+import TailwindInput from "../../components/TailwindInput";
+import { Switch } from "aspect-ui/Switch";
+import Select from "../../components/Select";
+import Icons from "../../components/icons/Icons";
 
-registerBlockType(metadata.name, { edit: EditComponent, save: SaveComponent });
+registerBlockType(metadata.name, {
+	edit: EditComponent,
+	save: SaveComponent,
+});
 
 function EditComponent(props) {
-	var attributes = props.attributes;
-	var setAttributes = props.setAttributes;
-	var accordion = attributes.accordion;
+	const { attributes, setAttributes } = props;
+	const { globalOptions } = attributes;
 
-	function updateTailwindClass(e) {
-		setAttributes({ accordion: { ...accordion, class: e } });
-	}
-	function updateAccordionId(e) {
-		setAttributes({ accordion: { ...accordion, id: e.target.value } });
-	}
-	function handleMultipleChange(e) {
-		setAttributes({ accordion: { ...accordion, multiple: e } });
-	}
-	function updateAccordionTag(e) {
+	const updateGlobalOption = (key, value) => {
 		setAttributes({
-			accordion: { ...accordion, tag: e.target.value },
+			globalOptions: { ...globalOptions, [key]: value },
 		});
-	}
+	};
 
 	const blockProps = useBlockProps({
 		className: cn(
 			"aspect-accordions aspect-accordions-accordion-editor",
-			accordion.accordionClassName
+			globalOptions.accordionClassName
 		),
 	});
+
 	const ALLOWED_BLOCKS = ["aspect-accordions/accordion-item"];
 	const MY_TEMPLATE = [
 		["aspect-accordions/accordion-item", {}],
 		["aspect-accordions/accordion-item", {}],
 	];
+
 	const innerBlocksProps = useInnerBlocksProps(blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		directInsert: true,
 		template: MY_TEMPLATE,
 		renderAppender: InnerBlocks.ButtonBlockAppender,
 	});
@@ -62,22 +54,73 @@ function EditComponent(props) {
 				<div className="aspect-blocks-editor-settings">
 					<Tabs defaultActive="item-1">
 						<TabList className="px-3">
-							<TabItem value="item-1">Options</TabItem>
-							<TabItem value="item-2">Style</TabItem>
+							<TabItem
+								value="item-1"
+								activeClassName="!bg-primary-900 !text-white dark:!bg-primary-900 dark:!text-white"
+								className="px-4 py-2 rounded-md bg-gray-200 text-gray-600">
+								Options
+							</TabItem>
+							<TabItem
+								value="item-2"
+								activeClassName="!bg-primary-900 !text-white dark:!bg-primary-900 dark:!text-white"
+								className="px-4 py-2 rounded-md bg-gray-200 text-gray-600">
+								Style
+							</TabItem>
 						</TabList>
 						<TabContent value="item-1" className="space-y-3 py-3 px-3">
-							{/* <InputData val={accordion.id} update={updateAccordionId} /> */}
-							{/* <SwitchData
-								label="Open Multiple"
-								val={accordion.multiple}
-								update={handleMultipleChange}
-							/> */}
+							<Switch
+								checked={globalOptions?.iconEnabled}
+								onChange={(value) => updateGlobalOption("iconEnabled", value)}
+								label="Icon Enable"
+								className="flex-row-reverse justify-between w-full"
+							/>
+							{globalOptions?.iconEnabled && (
+								<>
+									<Select
+										options={[
+											{ label: "Right", value: "right" },
+											{ label: "Left", value: "left" },
+										]}
+										label="Icon Position"
+										value={globalOptions?.iconPosition}
+										onChange={(value) =>
+											updateGlobalOption("iconPosition", value)
+										}
+									/>
+									<Icons
+										label="Active Icon"
+										val={globalOptions?.activeIcon}
+										update={(value) => updateGlobalOption("activeIcon", value)}
+										updateIconType={(value) =>
+											updateGlobalOption("activeIconType", value)
+										}
+									/>
+									<Icons
+										label="Inactive Icon"
+										val={globalOptions?.inactiveIcon}
+										update={(value) =>
+											updateGlobalOption("inactiveIcon", value)
+										}
+										updateIconType={(value) =>
+											updateGlobalOption("inactiveIconType", value)
+										}
+									/>
+								</>
+							)}
 						</TabContent>
-						<TabContent value="item-2">
-							{/* <Style
-								update={updateTailwindClass}
-								val={accordion.accordionClassName}
-							/> */}
+						<TabContent value="item-2" className="space-y-3 py-3 px-3">
+							<TailwindInput
+								val={globalOptions?.accordionClassName}
+								update={(value) =>
+									updateGlobalOption("accordionClassName", value)
+								}
+								label="Accordion Class Name"
+							/>
+							<TailwindInput
+								val={globalOptions?.headerClassName}
+								update={(value) => updateGlobalOption("headerClassName", value)}
+								label="Header Class Name"
+							/>
 						</TabContent>
 					</Tabs>
 				</div>

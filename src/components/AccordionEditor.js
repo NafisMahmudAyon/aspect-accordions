@@ -4,6 +4,7 @@ import AccordionGlobalOptions from "./AccordionGlobalOptions";
 import AccordionItemsEditor from "./AccordionItemsEditor";
 import AccordionPreview from "./AccordionPreview";
 import { defaultData } from "./defaultData";
+import qs from "qs";
 import {
 	Accordion,
 	AccordionContent,
@@ -19,33 +20,38 @@ const AccordionEditor = () => {
 	const [options, setOptions] = useState(null);
 	const [title, setTitle] = useState(""); // State for the accordion title
 	const [saveLoading, setSaveLoading] = useState(false);
-
-	console.log(aspectAccordionsData);
-
 	useEffect(() => {
 		fetch(`${aspectAccordionsData?.apiUrl}/list`, {
 			headers: { "X-WP-Nonce": aspectAccordionsData?.nonce },
 		})
-			.then((res) => res.json())
-			.then((data) => {setAccordions(data);console.log(data)})
+		.then((res) => res.json())
+			.then((data) => {
+				console.log("data: ",data)
+				setAccordions(data);
+			})
 			.catch((err) => console.error(err));
 	}, []);
 
-
-	
 	const startEditing = (accordion) => {
 		setCurrentAccordion(accordion);
 		setTitle(accordion.title); // Set the existing title for editing
-		setOptions(JSON.parse(accordion.content));
+		var parsedData = qs.parse(accordion?.content, { decode: true });
+		const content = Object.keys(parsedData).reduce((acc, key) => {
+			const cleanedKey = key.replace(/^amp;/, ""); // Remove the 'amp;' prefix
+			acc[cleanedKey] = parsedData[key];
+			return acc;
+		}, {});
+		setOptions(content);
 	};
-
+	
 	const startCreating = () => {
 		setCurrentAccordion(null);
 		setTitle("New Accordion"); // Default title for new accordion
 		setOptions(defaultData);
 	};
-
+	
 	const saveAccordion = async () => {
+		console.log(options)
 		setSaveLoading(true);
 		const response = await fetch(`${aspectAccordionsData?.apiUrl}/save`, {
 			method: "POST",
@@ -56,7 +62,7 @@ const AccordionEditor = () => {
 			body: JSON.stringify({
 				id: currentAccordion?.id || null,
 				title, // Use the title from state
-				content: JSON.stringify(options),
+				content: qs.stringify(options, { encode: true }),
 				status: "publish",
 			}),
 		});
@@ -71,7 +77,7 @@ const AccordionEditor = () => {
 		}
 		setSaveLoading(false);
 	};
-
+	
 	const startDeleting = async (id) => {
 		if (window.confirm("Are you sure you want to delete this accordion?")) {
 			try {
@@ -108,9 +114,9 @@ const AccordionEditor = () => {
 			console.error("Error copying accordion:", err);
 		}
 	};
-
+	
 	// const startQuickView = (accordion) => {
-	// 	alert(
+		// 	alert(
 	// 		`Quick View:\n\nTitle: ${accordion.title}\nContent: ${accordion.content}`
 	// 	);
 	// };
@@ -127,7 +133,7 @@ const AccordionEditor = () => {
 			console.error("Error fetching accordion list:", err);
 		}
 	};
-
+	
 	const updateGlobalOption = (key, value) => {
 		setOptions((prev) => ({
 			...prev,
@@ -136,6 +142,7 @@ const AccordionEditor = () => {
 	};
 
 	const updateItem = (index, key, value) => {
+		console.log("accordion editor: ",value)
 		if (index === null) {
 			// Handle entire list update (used for sorting)
 			setOptions((prev) => ({
@@ -144,14 +151,14 @@ const AccordionEditor = () => {
 			}));
 			return;
 		}
-
+		
 		// Update individual item
 		// setOptions((prev) => {
 		// 	const updatedItems = [...prev.items];
 		// 	updatedItems[index][key] = value;
 		// 	return { ...prev, items: updatedItems };
 		// });
-
+		
 		setOptions((prev) => {
 			const updatedItems = [...prev.items]; // Create a shallow copy of the items array
 			updatedItems[index] = { ...updatedItems[index], [key]: value }; // Create a new object for the updated item
@@ -194,6 +201,7 @@ const AccordionEditor = () => {
 			],
 		}));
 	};
+	console.log(accordions)
 	return (
 		<div className="aspect-accordion-dashboard">
 			{!options ? (
@@ -261,6 +269,7 @@ const AccordionEditor = () => {
 							className="flex-1 overflow-y-scroll"
 							globalOptions={options.global}
 							items={options.items}
+							updateItem={updateItem}
 						/>
 					</div>
 					<div className="flex items-center gap-2 mt-4">
@@ -283,5 +292,8 @@ const AccordionEditor = () => {
 };
 
 export default AccordionEditor;
+
+
+
 
 

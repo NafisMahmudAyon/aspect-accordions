@@ -1,10 +1,4 @@
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
-import AccordionDashboard from "./AccordionDashboard";
-import AccordionGlobalOptions from "./AccordionGlobalOptions";
-import AccordionItemsEditor from "./AccordionItemsEditor";
-import AccordionPreview from "./AccordionPreview";
-import { defaultData } from "./defaultData";
-import qs from "qs";
 import {
 	Accordion,
 	AccordionContent,
@@ -12,7 +6,13 @@ import {
 	AccordionItem,
 } from "aspect-ui/Accordion";
 import { Button } from "aspect-ui/Button";
-import React, { useEffect, useState } from "react";
+import qs from "qs";
+import React, { useEffect, useRef, useState } from "react";
+import AccordionDashboard from "./AccordionDashboard";
+import AccordionGlobalOptions from "./AccordionGlobalOptions";
+import AccordionItemsEditor from "./AccordionItemsEditor";
+import AccordionPreview from "./AccordionPreview";
+import { defaultData } from "./defaultData";
 
 const AccordionEditor = () => {
 	const [accordions, setAccordions] = useState([]);
@@ -20,17 +20,61 @@ const AccordionEditor = () => {
 	const [options, setOptions] = useState(null);
 	const [title, setTitle] = useState(""); // State for the accordion title
 	const [saveLoading, setSaveLoading] = useState(false);
+	const [postStatus, setPostStatus] = useState("publish");
+	const [currentPage, setCurrentPage] = useState(1); // Track the current page
+	const [totalPages, setTotalPages] = useState(1); // Track total number of pages
+	const mountedRef = useRef(true);
+
 	useEffect(() => {
-		fetch(`${aspectAccordionsData?.apiUrl}/list`, {
-			headers: { "X-WP-Nonce": aspectAccordionsData?.nonce },
-		})
-		.then((res) => res.json())
-			.then((data) => {
-				console.log("data: ",data)
-				setAccordions(data);
-			})
-			.catch((err) => console.error(err));
+		const listState =`/list?status=${postStatus}&page=${currentPage}`;
+		const fetchAccordions = async () => {
+			try {
+				const response = await fetch(
+					`${aspectAccordionsData?.apiUrl}${listState}`,
+					{
+						headers: { "X-WP-Nonce": aspectAccordionsData?.nonce },
+					}
+				);
+				if (!response.ok) {
+					throw new Error(`Error: ${response.statusText}`);
+				}
+				const data = await response.json();
+				console.log(data)
+				// Safely update state only if the component is still mounted
+				if (mountedRef.current) {
+					setAccordions(data.accordions);
+					setTotalPages(data.pagination.total_pages); // Set total pages
+				}
+			} catch (err) {
+				console.error("Error fetching accordions:", err);
+			}
+		};
+
+		fetchAccordions();
+	}, [postStatus, currentPage]); // Re-run when postStatus or currentPage changes
+
+	// Use a ref to check if the component is mounted to prevent setting state after unmount
+	useEffect(() => {
+		return () => {
+			mountedRef.current = false;
+		};
 	}, []);
+
+	// Functions to navigate between pages
+	const nextPage = () => {
+		if (currentPage < totalPages) {
+			setCurrentPage((prevPage) => prevPage + 1);
+		}
+	};
+
+	const prevPage = () => {
+		if (currentPage > 1) {
+			setCurrentPage((prevPage) => prevPage - 1);
+		}
+	};
+
+	console.log(accordions);
+	console.log(currentPage);
 
 	const startEditing = (accordion) => {
 		setCurrentAccordion(accordion);
@@ -43,51 +87,140 @@ const AccordionEditor = () => {
 		}, {});
 		setOptions(content);
 	};
-	
+
 	const startCreating = () => {
 		setCurrentAccordion(null);
 		setTitle("New Accordion"); // Default title for new accordion
 		setOptions(defaultData);
 	};
-	
-	const saveAccordion = async () => {
-		console.log(options)
-		setSaveLoading(true);
-		const response = await fetch(`${aspectAccordionsData?.apiUrl}/save`, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-				"X-WP-Nonce": aspectAccordionsData?.nonce,
-			},
-			body: JSON.stringify({
-				id: currentAccordion?.id || null,
-				title, // Use the title from state
-				content: qs.stringify(options, { encode: true }),
-				status: "publish",
-			}),
-		});
 
-		if (response.ok) {
-			await fetchUpdatedAccordionList(); // Fetch the updated list after saving
-			setCurrentAccordion(null);
-			setOptions(null);
-			setTitle(""); // Clear the title field
-		} else {
-			console.error("Error saving accordion");
-		}
-		setSaveLoading(false);
+	const filterSerializableData = (obj) => {
+		const isSerializable = (value) =>
+			typeof value !== "object" ||
+			value === null ||
+			Array.isArray(value) ||
+			Object.prototype.toString.call(value) === "[object Object]";
+
+		if (!isSerializable(obj)) return null;
+
+		return Object.entries(obj).reduce(
+			(acc, [key, value]) => {
+				acc[key] = isSerializable(value)
+					? value
+					: filterSerializableData(value);
+				return acc;
+			},
+			Array.isArray(obj) ? [] : {}
+		);
 	};
-	
-	const startDeleting = async (id) => {
-		if (window.confirm("Are you sure you want to delete this accordion?")) {
+
+	const saveAccordion = async (status = "publish") => {
+		try {
+			// Validate and filter options
+			const cleanedOptions = filterSerializableData(options);
+			if (!cleanedOptions) {
+				alert("Invalid data in accordion options. Please check your input.");
+				return;
+			}
+
+			setSaveLoading(true);
+
+			const response = await fetch(`${aspectAccordionsData?.apiUrl}/save`, {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+					"X-WP-Nonce": aspectAccordionsData?.nonce,
+				},
+				body: JSON.stringify({
+					id: currentAccordion?.id || null,
+					title, // Use the title from state
+					content: qs.stringify(cleanedOptions, { encode: true }),
+					status,
+				}),
+			});
+
+			if (response.ok) {
+				const result = await response.json();
+				await fetchUpdatedAccordionList();
+				setCurrentAccordion(null);
+				setOptions(null);
+				setTitle("");
+				alert("Accordion saved successfully!");
+			} else {
+				const error = await response.json();
+				console.error("Error saving accordion:", error);
+				alert(
+					error.message || "Failed to save the accordion. Please try again."
+				);
+			}
+		} catch (err) {
+			console.error("Unexpected error while saving accordion:", err);
+			alert("An unexpected error occurred. Please try again.");
+		} finally {
+			setSaveLoading(false);
+			setPostStatus("publish");
+		}
+	};
+
+	// const startDeleting = async (id) => {
+	// 	if (window.confirm(`${postStatus === "trash"} ? "Are you sure you want to delete this accordion?" : "Are you sure you want to move this accordion to the trash?"`)) {
+	// 		try {
+	// 			await fetch(`${aspectAccordionsData?.apiUrl}/delete/${id}`, {
+	// 				method: "DELETE",
+	// 				headers: { "X-WP-Nonce": aspectAccordionsData?.nonce },
+	// 			});
+	// 			await fetchUpdatedAccordionList(); // Refresh the list
+	// 		} catch (err) {
+	// 			console.error("Error deleting accordion:", err);
+	// 		}
+	// 	}
+	// };
+
+	const startDeleting = async (id, status = "trash") => {
+		const isTrash = postStatus === "trash";
+		let confirmationMessage;
+
+		if (isTrash && (status === "publish" || status === "draft")) {
+			confirmationMessage = "Are you sure you want to restore this accordion?";
+		} else if (isTrash) {
+			confirmationMessage =
+				"Are you sure you want to permanently delete this accordion?";
+		} else {
+			confirmationMessage =
+				"Are you sure you want to move this accordion to the trash?";
+		}
+
+		if (window.confirm(confirmationMessage)) {
 			try {
-				await fetch(`${aspectAccordionsData?.apiUrl}/delete/${id}`, {
-					method: "DELETE",
-					headers: { "X-WP-Nonce": aspectAccordionsData?.nonce },
+				// Determine API endpoint and HTTP method
+				const endpoint =
+					isTrash && (status === "publish" || status === "draft")
+						? `${aspectAccordionsData?.apiUrl}/status/${id}`
+						: isTrash
+						? `${aspectAccordionsData?.apiUrl}/delete/${id}`
+						: `${aspectAccordionsData?.apiUrl}/status/${id}`;
+
+				const method =
+					isTrash && (status === "publish" || status === "draft")
+						? "POST"
+						: isTrash
+						? "DELETE"
+						: "POST";
+				const body = method === "POST" ? JSON.stringify({ status }) : null;
+
+				await fetch(endpoint, {
+					method,
+					headers: {
+						"X-WP-Nonce": aspectAccordionsData?.nonce,
+						"Content-Type": "application/json",
+					},
+					body,
 				});
+
 				await fetchUpdatedAccordionList(); // Refresh the list
+				if (status === "publish") setPostStatus("publish");
 			} catch (err) {
-				console.error("Error deleting accordion:", err);
+				console.error("Error updating accordion status:", err);
 			}
 		}
 	};
@@ -114,9 +247,9 @@ const AccordionEditor = () => {
 			console.error("Error copying accordion:", err);
 		}
 	};
-	
+
 	// const startQuickView = (accordion) => {
-		// 	alert(
+	// 	alert(
 	// 		`Quick View:\n\nTitle: ${accordion.title}\nContent: ${accordion.content}`
 	// 	);
 	// };
@@ -128,12 +261,12 @@ const AccordionEditor = () => {
 				headers: { "X-WP-Nonce": aspectAccordionsData?.nonce },
 			});
 			const data = await response.json();
-			setAccordions(data);
+			setAccordions(data.accordions);
 		} catch (err) {
 			console.error("Error fetching accordion list:", err);
 		}
 	};
-	
+
 	const updateGlobalOption = (key, value) => {
 		setOptions((prev) => ({
 			...prev,
@@ -142,30 +275,62 @@ const AccordionEditor = () => {
 	};
 
 	const updateItem = (index, key, value) => {
-		console.log("accordion editor: ",value)
-		if (index === null) {
-			// Handle entire list update (used for sorting)
-			setOptions((prev) => ({
-				...prev,
-				items: value, // Update the entire items list
-			}));
+		if (value instanceof HTMLElement) {
+			console.warn("Avoid adding DOM elements to state:", value);
 			return;
 		}
-		
-		// Update individual item
-		// setOptions((prev) => {
-		// 	const updatedItems = [...prev.items];
-		// 	updatedItems[index][key] = value;
-		// 	return { ...prev, items: updatedItems };
-		// });
-		
 		setOptions((prev) => {
-			const updatedItems = [...prev.items]; // Create a shallow copy of the items array
-			updatedItems[index] = { ...updatedItems[index], [key]: value }; // Create a new object for the updated item
-			return { ...prev, items: updatedItems }; // Return the updated options
+			const updatedItems = [...prev.items];
+			updatedItems[index] = { ...updatedItems[index], [key]: value };
+			return { ...prev, items: updatedItems };
 		});
 	};
-	console.log("Updated items:", options?.items);
+
+	// const updateItem = (index, key, value) => {
+	// 	console.log("accordion editor: ", value);
+	// 	if (index === null) {
+	// 		// Handle entire list update (used for sorting)
+	// 		setOptions((prev) => ({
+	// 			...prev,
+	// 			items: value, // Update the entire items list
+	// 		}));
+	// 		return;
+	// 	}
+
+	// 	// Update individual item
+	// 	// setOptions((prev) => {
+	// 	// 	const updatedItems = [...prev.items];
+	// 	// 	updatedItems[index][key] = value;
+	// 	// 	return { ...prev, items: updatedItems };
+	// 	// });
+
+	// 	setOptions((prev) => {
+	// 		const updatedItems = [...prev.items]; // Create a shallow copy of the items array
+	// 		updatedItems[index] = { ...updatedItems[index], [key]: value }; // Create a new object for the updated item
+	// 		return { ...prev, items: updatedItems }; // Return the updated options
+	// 	});
+	// };
+
+	useEffect(() => {
+		const handleBeforeUnload = (event) => {
+			if (options !== null) {
+				// Custom message for the user
+				const message =
+					"You have unsaved changes. Are you sure you want to leave?";
+				// Standard way to show a prompt for beforeunload
+				event.returnValue = message; // For most browsers
+				return message; // For some older browsers
+			}
+		};
+
+		// Attach the event listener when the component mounts
+		window.addEventListener("beforeunload", handleBeforeUnload);
+
+		// Cleanup the event listener when the component unmounts
+		return () => {
+			window.removeEventListener("beforeunload", handleBeforeUnload);
+		};
+	}, [options]);
 
 	const cancelEditing = () => {
 		// Reset the states to exit the editing mode
@@ -201,97 +366,127 @@ const AccordionEditor = () => {
 			],
 		}));
 	};
-	console.log(accordions)
+
+	const handlePageChange = (page) => {
+    setCurrentPage(page)
+  }
+
 	return (
-		<div className="aspect-accordion-dashboard">
-			{!options ? (
-				<AccordionDashboard
-					accordions={accordions}
-					startCreating={startCreating}
-					startEditing={startEditing}
-					startDeleting={startDeleting}
-					startCopying={startCopying}
-					// startQuickView={startQuickView}
-				/>
-			) : (
-				<>
-					<div className="aspect-accordion-editor flex gap-5 max-h-[700px] h-[70vh] relative">
-						<aside className="w-[30%] max-w-[300px] sticky top-0 font-poppins overflow-y-auto light-scrollbar pr-2">
-							{/* Title Input */}
-							<div className="mb-4">
-								<label className="block text-sm font-medium mb-1">
-									Accordion Title
-								</label>
-								<input
-									type="text"
-									value={title}
-									onChange={(e) => setTitle(e.target.value)}
-									className="w-full px-3 py-2 border rounded-md text-sm"
-									placeholder="Enter accordion title"
-								/>
-							</div>
-							<Accordion>
-								<AccordionItem
-									id="item-1"
-									className="border-primary-200 dark:border-primary-200">
-									<AccordionHeader
-										className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
-										activeHeaderClassName="border-b">
-										<h3 className="text-h6 !text-[13px]">Global Options</h3>
-									</AccordionHeader>
-									<AccordionContent className="py-3 px-3 border-0 pb-3 bg-transparent dark:bg-transparent space-y-3">
-										<AccordionGlobalOptions
-											globalOptions={options.global}
-											itemsLength={options.items.length}
-											updateGlobalOption={updateGlobalOption}
-										/>
-									</AccordionContent>
-								</AccordionItem>
-								<AccordionItem
-									id="item-2"
-									className="border-primary-200 dark:border-primary-200">
-									<AccordionHeader
-										className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
-										activeHeaderClassName="border-b">
-										<h3 className="text-h6 !text-[13px]">Items Options</h3>
-									</AccordionHeader>
-									<AccordionContent className="py-3 px-3 border-0 pb-3 space-y-2 bg-transparent dark:bg-transparent">
-										<AccordionItemsEditor
-											items={options.items}
-											updateItem={updateItem}
-											addItem={() => addItem(options.items.length)}
-										/>
-									</AccordionContent>
-								</AccordionItem>
-							</Accordion>
-						</aside>
-						<AccordionPreview
-							className="flex-1 overflow-y-scroll"
-							globalOptions={options.global}
-							items={options.items}
-							updateItem={updateItem}
-						/>
-					</div>
-					<div className="flex items-center gap-2 mt-4">
-						<Button
-							icon={<CheckCircleIcon className="size-5" />}
-							loading={saveLoading}
-							onClick={saveAccordion}>
-							Save Accordion
-						</Button>
-						<Button
-							icon={<XCircleIcon className="size-5" />}
-							onClick={cancelEditing}>
-							Cancel Editing
-						</Button>
-					</div>
-				</>
-			)}
-		</div>
+		<>
+			<div className="aspect-accordion-dashboard">
+				{!options ? (
+					<AccordionDashboard
+						totalPages={totalPages}
+						currentPage={currentPage}
+						handlePageChange={handlePageChange}
+						accordions={accordions}
+						postStatus={postStatus}
+						handlePostStatusChange={setPostStatus}
+						startCreating={startCreating}
+						startEditing={startEditing}
+						startDeleting={startDeleting}
+						startCopying={startCopying}
+						// startQuickView={startQuickView}
+					/>
+				) : (
+					<>
+						<div className="aspect-accordion-editor flex gap-5 max-h-[700px] h-[70vh] relative">
+							<aside className="w-[30%] max-w-[300px] sticky top-0 font-poppins overflow-y-auto light-scrollbar pr-2">
+								{/* <button onClick={() => {
+									//clipboard the options
+									navigator.clipboard.writeText(JSON.stringify(options));
+									alert("Options copied to clipboard!");
+								}}>Copy</button> */}
+								{/* Title Input */}
+								<div className="mb-4">
+									<label className="block text-sm font-medium mb-1">
+										Accordion Title
+									</label>
+									<input
+										type="text"
+										value={title}
+										onChange={(e) => setTitle(e.target.value)}
+										className="w-full px-3 py-2 border rounded-md text-sm"
+										placeholder="Enter accordion title"
+									/>
+								</div>
+								<Accordion>
+									<AccordionItem
+										id="item-1"
+										className="border-primary-200 dark:border-primary-200">
+										<AccordionHeader
+											className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
+											activeHeaderClassName="border-b">
+											<h3 className="text-h6 !text-[13px]">Global Options</h3>
+										</AccordionHeader>
+										<AccordionContent className="py-3 px-3 border-0 pb-3 bg-transparent dark:bg-transparent space-y-3">
+											<AccordionGlobalOptions
+												globalOptions={options.global}
+												itemsLength={options.items.length}
+												updateGlobalOption={updateGlobalOption}
+											/>
+										</AccordionContent>
+									</AccordionItem>
+									<AccordionItem
+										id="item-2"
+										className="border-primary-200 dark:border-primary-200">
+										<AccordionHeader
+											className="bg-transparent hover:bg-transparent dark:bg-transparent dark:hover:bg-transparent pl-2 py-2 font-medium text-primary-900 dark:text-primary-900"
+											activeHeaderClassName="border-b">
+											<h3 className="text-h6 !text-[13px]">Items Options</h3>
+										</AccordionHeader>
+										<AccordionContent className="py-3 px-3 border-0 pb-3 space-y-2 bg-transparent dark:bg-transparent">
+											<AccordionItemsEditor
+												items={options.items}
+												updateItem={updateItem}
+												addItem={() => addItem(options.items.length)}
+											/>
+										</AccordionContent>
+									</AccordionItem>
+								</Accordion>
+							</aside>
+							<AccordionPreview
+								className="flex-1 overflow-y-scroll"
+								globalOptions={options.global}
+								items={options.items}
+								updateItem={updateItem}
+							/>
+						</div>
+						<div className="flex items-center gap-2 mt-4">
+							<Button
+								icon={<CheckCircleIcon className="size-5" />}
+								loading={saveLoading}
+								onClick={() => saveAccordion("publish")}>
+								Save Accordion
+							</Button>
+							<Button
+								icon={<CheckCircleIcon className="size-5" />}
+								loading={saveLoading}
+								onClick={() => saveAccordion("draft")}>
+								Save as Draft
+							</Button>
+							<Button
+								icon={<XCircleIcon className="size-5" />}
+								onClick={cancelEditing}>
+								Cancel Editing
+							</Button>
+						</div>
+					</>
+				)}
+			</div>
+		</>
 	);
 };
 
 export default AccordionEditor;
+
+
+
+
+
+
+
+
 
 
 

@@ -37,6 +37,8 @@ class AspectAccordions
 
         add_action('enqueue_block_assets', [$this, 'enqueue_tailwind_cdn']);
 
+        add_action('admin_init', [$this, 'suppress_notices_on_custom_page']);
+
         add_action('init', [$this, 'aspectAccordions_register_blocks']);
     }
 
@@ -135,6 +137,13 @@ class AspectAccordions
 {
     register_block_type(__DIR__ . '/build/blocks/accordion');
     register_block_type(__DIR__ . '/build/blocks/accordion-item');
+}
+
+public function suppress_notices_on_custom_page() {
+    // Check if we are on the custom dashboard page
+    if (isset($_GET['page']) && $_GET['page'] === 'aspect-accordions') { // Adjust the page slug
+        remove_all_actions('admin_notices');
+    }
 }
 
 

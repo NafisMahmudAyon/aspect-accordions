@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import iconsListOutline from "./IconListOutline";
 import iconsListSolid from "./IconListSolid";
 
-const IconSelector = ({ iconType, iconName }) => {
+const IconSelector = ({ iconType, iconName, className="" }) => {
 	// Determine the icon list based on the type
 	const iconList = useMemo(
 		() => (iconType === "solid" ? iconsListSolid : iconsListOutline),
@@ -18,7 +18,7 @@ const IconSelector = ({ iconType, iconName }) => {
 	// Select the icon component
 	const SelectedIcon = iconMap[iconName] || null;
 
-	return SelectedIcon ? <SelectedIcon /> : null;
+	return SelectedIcon ? <SelectedIcon className={className} /> : null;
 };
 
 export default IconSelector;

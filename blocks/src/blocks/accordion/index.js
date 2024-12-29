@@ -13,6 +13,7 @@ import TailwindInput from "../../components/TailwindInput";
 import { Switch } from "aspect-ui/Switch";
 import Select from "../../components/Select";
 import Icons from "../../components/icons/Icons";
+import { useEffect, useState } from "react";
 
 registerBlockType(metadata.name, {
 	edit: EditComponent,
@@ -47,6 +48,23 @@ function EditComponent(props) {
 		template: MY_TEMPLATE,
 		renderAppender: InnerBlocks.ButtonBlockAppender,
 	});
+
+	const [activeIcon, setActiveIcon] = useState(globalOptions.activeIcon || null);
+	useEffect(() => {
+		updateGlobalOption("activeIcon", activeIcon);
+	}, [activeIcon]);
+	console.log(globalOptions.activeIcon);
+	const handleActiveIcon = (iconName) => {
+		setActiveIcon(iconName);
+	};
+	const [inactiveIcon, setInactiveIcon] = useState(globalOptions.inactiveIcon || null);
+	useEffect(() => {
+		updateGlobalOption("inactiveIcon", inactiveIcon);
+	}, [inactiveIcon]);
+	console.log(globalOptions.inactiveIcon);
+	const handleInactiveIcon = (iconName) => {
+		setInactiveIcon(iconName);
+	};
 
 	return (
 		<>
@@ -89,18 +107,16 @@ function EditComponent(props) {
 									/>
 									<Icons
 										label="Active Icon"
-										val={globalOptions?.activeIcon}
-										update={(value) => updateGlobalOption("activeIcon", value)}
+										val={activeIcon}
+										update={handleActiveIcon}
 										updateIconType={(value) =>
 											updateGlobalOption("activeIconType", value)
 										}
 									/>
 									<Icons
 										label="Inactive Icon"
-										val={globalOptions?.inactiveIcon}
-										update={(value) =>
-											updateGlobalOption("inactiveIcon", value)
-										}
+										val={inactiveIcon}
+										update={handleInactiveIcon}
 										updateIconType={(value) =>
 											updateGlobalOption("inactiveIconType", value)
 										}

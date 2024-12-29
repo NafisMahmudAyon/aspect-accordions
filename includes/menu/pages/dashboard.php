@@ -2,13 +2,13 @@
 if (!defined('ABSPATH')) exit;
 ?>
 <div class="wrap">
-  <h1><?php echo esc_html__('Create Accordion', 'aspect-accordions'); ?></h1>
-  <div class="wrap">
-    <a href="<?php echo esc_url(admin_url('post-new.php?post_type=aspect_accordions')); ?>" class="page-title-action">
-      <?php echo esc_html__('Add New Accordion', 'aspect-accordions'); ?>
+  <h1><?php echo esc_html__('Accordion Dashboard', 'aspect-accordions'); ?></h1>
+  <!-- <div class="wrap">
+    <a href="<?php //echo esc_url(admin_url('post-new.php?post_type=aspect_accordions')); ?>" class="page-title-action">
+      <?php //echo esc_html__('Add New Accordion', 'aspect-accordions'); ?>
     </a>
 
-  </div>
+  </div> -->
   <div id="aspect-accordions-app"></div>
 </div>
 

@@ -2834,6 +2834,45 @@ const iconsListSolid = [{
 
 /***/ }),
 
+/***/ "./src/components/icons/IconSelector.jsx":
+/*!***********************************************!*\
+  !*** ./src/components/icons/IconSelector.jsx ***!
+  \***********************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
+/* harmony export */ });
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _IconListOutline__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./IconListOutline */ "./src/components/icons/IconListOutline.jsx");
+/* harmony import */ var _IconListSolid__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./IconListSolid */ "./src/components/icons/IconListSolid.jsx");
+
+
+
+
+const IconSelector = ({
+  iconType,
+  iconName,
+  className = ""
+}) => {
+  // Determine the icon list based on the type
+  const iconList = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => iconType === "solid" ? _IconListSolid__WEBPACK_IMPORTED_MODULE_2__["default"] : _IconListOutline__WEBPACK_IMPORTED_MODULE_1__["default"], [iconType]);
+
+  // Map icon names to their components
+  const iconMap = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => Object.fromEntries(iconList.map(item => [item.name, item.icon])), [iconList]);
+
+  // Select the icon component
+  const SelectedIcon = iconMap[iconName] || null;
+  return SelectedIcon ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(SelectedIcon, {
+    className: className
+  }) : null;
+};
+/* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (IconSelector);
+
+/***/ }),
+
 /***/ "./src/components/icons/Icons.jsx":
 /*!****************************************!*\
   !*** ./src/components/icons/Icons.jsx ***!
@@ -2850,6 +2889,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _wordpress_components__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _IconListOutline__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./IconListOutline */ "./src/components/icons/IconListOutline.jsx");
 /* harmony import */ var _IconListSolid__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./IconListSolid */ "./src/components/icons/IconListSolid.jsx");
+/* harmony import */ var _IconSelector__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./IconSelector */ "./src/components/icons/IconSelector.jsx");
+
 
 
 
@@ -2866,10 +2907,6 @@ const Icons = ({
 
   // Memoize the icons list and map for performance
   const iconsList = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => iconType === "solid" ? _IconListSolid__WEBPACK_IMPORTED_MODULE_3__["default"] : _IconListOutline__WEBPACK_IMPORTED_MODULE_2__["default"], [iconType]);
-  const iconsMap = (0,react__WEBPACK_IMPORTED_MODULE_0__.useMemo)(() => Object.fromEntries(iconsList.map(item => [item.name, item.icon])), [iconsList]);
-
-  // Get the selected icon component
-  const SelectedIcon = iconsMap[val];
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "flex flex-col gap-2 text-[11px] font-medium text-primary-900 dark:text-primary-900"
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
@@ -2880,8 +2917,10 @@ const Icons = ({
     "aria-haspopup": "true",
     "aria-expanded": open,
     "aria-label": "Select an icon"
-  }, SelectedIcon ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(SelectedIcon, {
-    className: "size-4 text-primary-900"
+  }, val ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_IconSelector__WEBPACK_IMPORTED_MODULE_4__["default"], {
+    className: "size-4 text-primary-900",
+    iconType: iconType,
+    iconName: val
   }) : (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("span", {
     className: "size-4 text-gray-400"
   }, "?"))), open && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_components__WEBPACK_IMPORTED_MODULE_1__.Popover, {
@@ -2910,6 +2949,7 @@ const Icons = ({
       key: i,
       className: "flex items-center flex-col text-center p-2 focus:outline-none",
       onClick: () => {
+        console.log("name: ", icon.name);
         update(icon.name);
         updateIconType(iconType);
         setOpen(false);
@@ -32882,6 +32922,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+
 (0,_wordpress_blocks__WEBPACK_IMPORTED_MODULE_2__.registerBlockType)(_block_json__WEBPACK_IMPORTED_MODULE_3__.name, {
   edit: EditComponent,
   save: SaveComponent
@@ -32912,6 +32953,22 @@ function EditComponent(props) {
     template: MY_TEMPLATE,
     renderAppender: _wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.InnerBlocks.ButtonBlockAppender
   });
+  const [activeIcon, setActiveIcon] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(globalOptions.activeIcon || null);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    updateGlobalOption("activeIcon", activeIcon);
+  }, [activeIcon]);
+  console.log(globalOptions.activeIcon);
+  const handleActiveIcon = iconName => {
+    setActiveIcon(iconName);
+  };
+  const [inactiveIcon, setInactiveIcon] = (0,react__WEBPACK_IMPORTED_MODULE_0__.useState)(globalOptions.inactiveIcon || null);
+  (0,react__WEBPACK_IMPORTED_MODULE_0__.useEffect)(() => {
+    updateGlobalOption("inactiveIcon", inactiveIcon);
+  }, [inactiveIcon]);
+  console.log(globalOptions.inactiveIcon);
+  const handleInactiveIcon = iconName => {
+    setInactiveIcon(iconName);
+  };
   return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_wordpress_block_editor__WEBPACK_IMPORTED_MODULE_1__.InspectorControls, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
     className: "aspect-blocks-editor-settings"
   }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(aspect_ui_Tabs__WEBPACK_IMPORTED_MODULE_4__.Tabs, {
@@ -32947,13 +33004,13 @@ function EditComponent(props) {
     onChange: value => updateGlobalOption("iconPosition", value)
   }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_components_icons_Icons__WEBPACK_IMPORTED_MODULE_9__["default"], {
     label: "Active Icon",
-    val: globalOptions?.activeIcon,
-    update: value => updateGlobalOption("activeIcon", value),
+    val: activeIcon,
+    update: handleActiveIcon,
     updateIconType: value => updateGlobalOption("activeIconType", value)
   }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(_components_icons_Icons__WEBPACK_IMPORTED_MODULE_9__["default"], {
     label: "Inactive Icon",
-    val: globalOptions?.inactiveIcon,
-    update: value => updateGlobalOption("inactiveIcon", value),
+    val: inactiveIcon,
+    update: handleInactiveIcon,
     updateIconType: value => updateGlobalOption("inactiveIconType", value)
   }))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(aspect_ui_Tabs__WEBPACK_IMPORTED_MODULE_4__.TabContent, {
     value: "item-2",

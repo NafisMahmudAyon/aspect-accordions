@@ -1,29 +1,18 @@
 import { Popover } from "@wordpress/components";
-import { useState, useMemo } from "react";
+import { useMemo, useState } from "react";
 import iconsListOutline from "./IconListOutline";
 import iconsListSolid from "./IconListSolid";
+import IconSelector from "./IconSelector";
 
-const Icons = ({
-	label = "Select Icon",
-	val,
-	update,
-	updateIconType,
-}) => {
+const Icons = ({ label = "Select Icon", val, update, updateIconType }) => {
 	const [iconType, setIconType] = useState("solid");
 	const [open, setOpen] = useState(false);
 
 	// Memoize the icons list and map for performance
 	const iconsList = useMemo(
 		() => (iconType === "solid" ? iconsListSolid : iconsListOutline),
-		[iconType],
+		[iconType]
 	);
-	const iconsMap = useMemo(
-		() => Object.fromEntries(iconsList.map((item) => [item.name, item.icon])),
-		[iconsList],
-	);
-
-	// Get the selected icon component
-	const SelectedIcon = iconsMap[val];
 
 	return (
 		<div className="flex flex-col gap-2 text-[11px] font-medium text-primary-900 dark:text-primary-900">
@@ -34,10 +23,13 @@ const Icons = ({
 					className="p-2 border border-primary-900 rounded-md"
 					aria-haspopup="true"
 					aria-expanded={open}
-					aria-label="Select an icon"
-				>
-					{SelectedIcon ? (
-						<SelectedIcon className="size-4 text-primary-900" />
+					aria-label="Select an icon">
+					{val ? (
+						<IconSelector
+							className="size-4 text-primary-900"
+							iconType={iconType}
+							iconName={val}
+						/>
 					) : (
 						<span className="size-4 text-gray-400">?</span>
 					)}
@@ -57,8 +49,7 @@ const Icons = ({
 									iconType === "solid"
 										? "bg-primary-900 text-white"
 										: "bg-gray-200 text-gray-600"
-								}`}
-							>
+								}`}>
 								Solid
 							</button>
 							<button
@@ -70,8 +61,7 @@ const Icons = ({
 									iconType === "outline"
 										? "bg-primary-900 text-white"
 										: "bg-gray-200 text-gray-600"
-								}`}
-							>
+								}`}>
 								Outline
 							</button>
 						</div>
@@ -83,12 +73,12 @@ const Icons = ({
 										key={i}
 										className="flex items-center flex-col text-center p-2 focus:outline-none"
 										onClick={() => {
+											console.log("name: ", icon.name);
 											update(icon.name);
 											updateIconType(iconType);
 											setOpen(false);
 										}}
-										aria-label={icon.name}
-									>
+										aria-label={icon.name}>
 										<Icon className="w-6 h-6 text-gray-600" />
 										{/* <span className="text-xs font-light tracking-wide mt-1">
 											{icon.name}

@@ -1,3 +1,4 @@
+import RichTextViewer from "@components/RichTextViewer";
 import IconSelector from "@icons/IconSelector";
 import {
 	Accordion,
@@ -7,7 +8,6 @@ import {
 } from "aspect-ui/Accordion";
 import React from "react";
 import ReactDOM from "react-dom";
-import RichTextViewer from "@components/RichTextViewer";
 
 document.addEventListener("DOMContentLoaded", () => {
 	const accordions = document.querySelectorAll(".aspect-accordion");
@@ -85,3 +85,4 @@ document.addEventListener("DOMContentLoaded", () => {
 		}
 	});
 });
+

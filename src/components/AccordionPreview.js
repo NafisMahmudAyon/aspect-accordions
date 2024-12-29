@@ -1,16 +1,21 @@
+import { Switch } from "aspect-ui";
 import {
 	Accordion,
 	AccordionContent,
 	AccordionHeader,
 	AccordionItem,
 } from "aspect-ui/Accordion";
-import qs from "qs";
 import React, { useState } from "react";
 import IconSelector from "./icons/IconSelector";
 import MarkdownEditor from "./MarkdownEditor";
-import { Switch } from "aspect-ui";
 
-const AccordionPreview = ({ globalOptions, items, className, updateItem, quickView=false }) => {
+const AccordionPreview = ({
+	globalOptions,
+	items,
+	className,
+	updateItem,
+	quickView = false,
+}) => {
 	console.log("Preview props:", { globalOptions, items });
 	console.log("first", items[0].headerClassName);
 
@@ -19,13 +24,13 @@ const AccordionPreview = ({ globalOptions, items, className, updateItem, quickVi
 		globalOptions?.activeItems?.map((index) => `item-${index + 1}`) || [];
 
 	const [preview, setPreview] = useState(false);
-	console.log(items.disabled)
+	console.log(items.disabled);
 
 	// console.log("Preview props:", { globalOptions, items });
 	// console.log("first",items[0].headerClassName);
 
 	return (
-		<div className={`accordion-preview ${className}`}>
+		<div className={`accordion-preview font-poppins ${className}`}>
 			<h3>Accordion Preview</h3>
 			<Accordion
 				activeItem={activeItems}
@@ -38,7 +43,7 @@ const AccordionPreview = ({ globalOptions, items, className, updateItem, quickVi
 						<AccordionItem
 							key={index}
 							id={`item-${index + 1}`}
-							disabled={item.disabled==="true"?true:false}>
+							disabled={item.disabled === "true" ? true : false}>
 							<AccordionHeader
 								iconEnabled={item.iconEnabled}
 								iconPosition={item.iconPosition}

@@ -9,11 +9,9 @@ export const SlateEditor = ({ value, onChange, placeholder }) => {
 	);
 
 	const handleChange = (newValue) => {
-		console.log(newValue);
 		setEditorValue(newValue);
 		onChange(JSON.stringify(newValue)); // Serialize the Slate JSON
 	};
-	console.log(value);
 
 	return (
 		<div style={{ border: "1px solid #ddd", padding: "10px" }}>

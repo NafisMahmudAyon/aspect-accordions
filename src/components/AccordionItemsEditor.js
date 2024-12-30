@@ -90,19 +90,19 @@ const AccordionItemsEditor = ({ items, updateItem, addItem }) => {
 										<Tabs defaultActive="item-1">
 											<TabList className="px-3">
 												<TabItem
-													value="item-1"
+													id="item-1"
 													activeClassName="!bg-primary-900 !text-white dark:!bg-primary-900 dark:!text-white"
 													className="px-4 py-2 rounded-md bg-gray-200 text-gray-600 dark:bg-gray-200 dark:text-gray-600">
 													Options
 												</TabItem>
 												<TabItem
-													value="item-2"
+													id="item-2"
 													activeClassName="!bg-primary-900 !text-white dark:!bg-primary-900 dark:!text-white"
 													className="px-4 py-2 rounded-md bg-gray-200 text-gray-600 dark:bg-gray-200 dark:text-gray-600">
 													Style
 												</TabItem>
 											</TabList>
-											<TabContent value="item-1" className="space-y-3">
+											<TabContent id="item-1" className="space-y-3">
 												{/* <SlateEditor
 												value={item.headerLabel}
 												onChange={(value) =>
@@ -193,7 +193,7 @@ const AccordionItemsEditor = ({ items, updateItem, addItem }) => {
 													</>
 												)}
 											</TabContent>
-											<TabContent value="item-2" className="space-y-3">
+											<TabContent id="item-2" className="space-y-3">
 												<TailwindInput
 													val={item?.headerClassName}
 													update={(value) =>

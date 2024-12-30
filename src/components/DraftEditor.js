@@ -20,7 +20,6 @@ const DraftEditor = ({ value, onChange, placeholder }) => {
 	const handleEditorChange = (state) => {
 		setEditorState(state);
 		const content = convertToRaw(state.getCurrentContent());
-		console.log(JSON.stringify(content));
 		onChange?.(JSON.stringify(content)); // Serialize the content to JSON
 	};
 

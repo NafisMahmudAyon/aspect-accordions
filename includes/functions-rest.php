@@ -107,6 +107,14 @@ add_action('rest_api_init', function () {
             return current_user_can('edit_posts');
         },
     ]);
+
+    register_rest_route('aspect-accordions/v2', '/bulk-update', [
+        'methods' => 'POST',
+        'callback' => 'handle_bulk_update',
+        'permission_callback' => function () {
+            return current_user_can('edit_posts');
+        },
+    ]);
 });
 
 // Get all accordions
@@ -187,9 +195,11 @@ function aspect_get_accordions_by_status($request) {
         return [
             'id' => $post->ID,
             'title' => $post->post_title,
-            'content' => $post->post_content,
+            'content' => json_decode($post->post_content),
         ];
     }, $query->posts);
+
+    // error_log(json_encode($accordions));
 
     // Add pagination info
     $response = [
@@ -202,7 +212,7 @@ function aspect_get_accordions_by_status($request) {
         ],
     ];
 
-    return rest_ensure_response($response);
+    return json_encode($response);
 }
 function aspect_get_draft_accordions() {
     $posts = get_posts([
@@ -236,10 +246,57 @@ function aspect_get_trash_accordions() {
 }
 
 // Save (create/update) accordion
+// function aspect_save_accordion($request) {
+//     $params = $request->get_json_params();
+
+//     // Validate required fields
+//     if (empty($params['title'])) {
+//         return new WP_Error('missing_title', 'The title field is required.', ['status' => 400]);
+//     }
+
+//     if (empty($params['content'])) {
+//         return new WP_Error('missing_content', 'The content field is required.', ['status' => 400]);
+//     }
+
+//     // error_log(wp_json_encode($params['content']));
+//     error_log("Received params: " . wp_json_encode($params));
+// error_log("Content before sanitization: " . wp_json_encode($params['content']));
+
+//     // Sanitize inputs
+//     $post_data = [
+//         'post_title'   => sanitize_text_field($params['title']),
+//         'post_content' => wp_json_encode($params['content']),
+//         'post_status'  => sanitize_text_field($params['status']),
+//         'post_type'    => 'aspect_accordions',
+//     ];
+
+//     error_log(json_encode($post_data));
+
+//     // Handle update or insert
+//     if (!empty($params['id'])) {
+//         $post_data['ID'] = intval($params['id']);
+//         $post_id = wp_update_post($post_data, true);
+//     } else {
+//         $post_id = wp_insert_post($post_data, true);
+//     }
+
+//     if (is_wp_error($post_id)) {
+//         return new WP_Error('save_failed', 'Failed to save accordion.', ['status' => 500]);
+//     }
+
+//     return [
+//         'message' => 'Accordion saved successfully.',
+//         'accordion' => get_post($post_id),
+//     ];
+// }
+
+
 function aspect_save_accordion($request) {
     $params = $request->get_json_params();
 
-    // Validate required fields
+    // Debug logs to inspect received data
+    // error_log("Received params: " . wp_json_encode($params));
+
     if (empty($params['title'])) {
         return new WP_Error('missing_title', 'The title field is required.', ['status' => 400]);
     }
@@ -248,15 +305,18 @@ function aspect_save_accordion($request) {
         return new WP_Error('missing_content', 'The content field is required.', ['status' => 400]);
     }
 
-    // Sanitize inputs
+    // Debug log content before sanitization
+    // error_log("Content before sanitization: " . wp_json_encode($params['content']));
+
     $post_data = [
         'post_title'   => sanitize_text_field($params['title']),
-        'post_content' => serialize(wp_kses_post($params['content'])),
+        'post_content' => wp_slash(wp_json_encode($params['content'])), // Safely encode content
         'post_status'  => sanitize_text_field($params['status']),
         'post_type'    => 'aspect_accordions',
     ];
 
-    // Handle update or insert
+    // error_log("Post data being saved: " . wp_json_encode($post_data));
+
     if (!empty($params['id'])) {
         $post_data['ID'] = intval($params['id']);
         $post_id = wp_update_post($post_data, true);
@@ -265,12 +325,17 @@ function aspect_save_accordion($request) {
     }
 
     if (is_wp_error($post_id)) {
+        error_log("Error saving accordion: " . $post_id->get_error_message());
         return new WP_Error('save_failed', 'Failed to save accordion.', ['status' => 500]);
     }
 
+    $accordion = get_post($post_id);
+    $accordion->post_content = json_decode($accordion->post_content, true); // Decode JSON
+    // error_log("Saved accordion content: " . wp_json_encode($accordion->post_content));
+
     return [
         'message' => 'Accordion saved successfully.',
-        'accordion' => get_post($post_id),
+        'accordion' => $accordion,
     ];
 }
 
@@ -362,5 +427,50 @@ function aspect_change_accordion_status($request) {
         'message' => 'Accordion status updated successfully',
         'id' => $id,
         'status' => $status,
+    ];
+}
+
+function handle_bulk_update($request) {
+    $params = $request->get_json_params();
+
+    // error_log(print_r($params, true));
+
+    // Validate input
+    if (empty($params['ids']) || !is_array($params['ids'])) {
+        return new WP_Error('invalid_ids', 'Invalid or missing accordion IDs.', ['status' => 400]);
+    }
+
+    if (empty($params['status']) || !in_array($params['status'], ['publish', 'draft', 'trash'])) {
+        return new WP_Error('invalid_status', 'Invalid or missing status.', ['status' => 400]);
+    }
+
+    $ids = array_map('intval', $params['ids']);
+    $status = sanitize_text_field($params['status']);
+    $updated = [];
+
+    // error_log(print_r($ids, true));
+    // error_log(print_r($status, true));
+
+    foreach ($ids as $id) {
+        // Check if the post exists and is of the custom post type "accordion"
+        $post = get_post($id);
+
+        if ($post && $post->post_type === 'aspect_accordions') {
+            // Update the post status
+            $update_result = wp_update_post([
+                'ID' => $id,
+                'post_status' => $status,
+            ], true);
+
+            if (!is_wp_error($update_result)) {
+                $updated[] = $id;
+            }
+        }
+    }
+
+    return [
+        'success' => true,
+        'updated_ids' => $updated,
+        'message' => count($updated) . ' accordion(s) updated to ' . $status . '.',
     ];
 }

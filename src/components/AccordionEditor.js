@@ -17,6 +17,8 @@ import { defaultData } from "./defaultData";
 const AccordionEditor = () => {
 	const [accordions, setAccordions] = useState([]);
 	const [currentAccordion, setCurrentAccordion] = useState(null);
+	const [selectedAccordions, setSelectedAccordions] = useState([]);
+
 	const [options, setOptions] = useState(null);
 	const [title, setTitle] = useState(""); // State for the accordion title
 	const [saveLoading, setSaveLoading] = useState(false);
@@ -24,9 +26,13 @@ const AccordionEditor = () => {
 	const [currentPage, setCurrentPage] = useState(1); // Track the current page
 	const [totalPages, setTotalPages] = useState(1); // Track total number of pages
 	const mountedRef = useRef(true);
+	const [isAccordion, setIsAccordion] = useState(null);
+	useEffect(() => {
+		setIsAccordion(options?.global?.isAccordion ?? true);
+	}, [options?.global]);
 
 	useEffect(() => {
-		const listState =`/list?status=${postStatus}&page=${currentPage}`;
+		const listState = `/list?status=${postStatus}&page=${currentPage}`;
 		const fetchAccordions = async () => {
 			try {
 				const response = await fetch(
@@ -38,12 +44,13 @@ const AccordionEditor = () => {
 				if (!response.ok) {
 					throw new Error(`Error: ${response.statusText}`);
 				}
+				var dataX = [];
 				const data = await response.json();
-				console.log(data)
+				dataX = JSON.parse(data)
 				// Safely update state only if the component is still mounted
 				if (mountedRef.current) {
-					setAccordions(data.accordions);
-					setTotalPages(data.pagination.total_pages); // Set total pages
+					setAccordions(dataX.accordions);
+					setTotalPages(dataX.pagination.total_pages); // Set total pages
 				}
 			} catch (err) {
 				console.error("Error fetching accordions:", err);
@@ -60,33 +67,60 @@ const AccordionEditor = () => {
 		};
 	}, []);
 
-	// Functions to navigate between pages
-	const nextPage = () => {
-		if (currentPage < totalPages) {
-			setCurrentPage((prevPage) => prevPage + 1);
-		}
-	};
-
-	const prevPage = () => {
-		if (currentPage > 1) {
-			setCurrentPage((prevPage) => prevPage - 1);
-		}
-	};
-
-	console.log(accordions);
-	console.log(currentPage);
-
 	const startEditing = (accordion) => {
 		setCurrentAccordion(accordion);
+		// setIsAccordion(accordion.isAccordion ?? true);
 		setTitle(accordion.title); // Set the existing title for editing
-		var parsedData = qs.parse(accordion?.content, { decode: true });
-		const content = Object.keys(parsedData).reduce((acc, key) => {
-			const cleanedKey = key.replace(/^amp;/, ""); // Remove the 'amp;' prefix
-			acc[cleanedKey] = parsedData[key];
-			return acc;
-		}, {});
-		setOptions(content);
+		// var parsedData = qs.parse(accordion?.content, { decode: true });
+		// const content = Object.keys(accordion?.content).reduce((acc, key) => {
+		// 	const cleanedKey = key.replace(/^amp;/, ""); // Remove the 'amp;' prefix
+		// 	acc[cleanedKey] = parsedData[key];
+		// 	return acc;
+		// }, {});
+		setOptions(accordion?.content);
 	};
+
+	// const startEditing = (accordion) => {
+	// 	setCurrentAccordion(accordion);
+	// 	setTitle(accordion.title); // Set the existing title for editing
+
+	// 	console.log(accordion?.content);
+
+	// 	// Parse the query string into an object
+	// 	var parsedData = qs.parse(accordion?.content, { decode: true });
+	// 	console.log(parsedData);
+
+	// 	// Clean and merge the keys, ensuring global fields are properly handled
+	// 	const content = Object.keys(parsedData).reduce((acc, key) => {
+	// 		const cleanedKey = key.replace(/^amp;/, ""); // Remove the 'amp;' prefix
+	// 		const [parentKey, subKey] = cleanedKey.split(/\[|\]/).filter(Boolean);
+
+	// 		if (parentKey === "global") {
+	// 			if (!acc.global) acc.global = {};
+	// 			acc.global[subKey] = parsedData[key];
+	// 		} else if (parentKey === "items") {
+	// 			if (!acc.items) acc.items = [];
+	// 			const itemIndex = parseInt(subKey, 10); // Convert index to number
+	// 			if (!acc.items[itemIndex]) acc.items[itemIndex] = {};
+	// 			const [, itemSubKey] = cleanedKey.split(/\]\[/).filter(Boolean);
+	// 			acc.items[itemIndex][itemSubKey] = parsedData[key];
+	// 		} else {
+	// 			acc[parentKey] = parsedData[key];
+	// 		}
+
+	// 		return acc;
+	// 	}, {});
+
+	// 	// Add the original global fields (if needed)
+	// 	content.global.isAccordion = parsedData.global?.isAccordion || "false";
+
+	// 	console.log(content);
+
+	// 	// Set the merged options
+	// 	setOptions(content);
+	// };
+
+
 
 	const startCreating = () => {
 		setCurrentAccordion(null);
@@ -113,11 +147,10 @@ const AccordionEditor = () => {
 			Array.isArray(obj) ? [] : {}
 		);
 	};
-
 	const saveAccordion = async (status = "publish") => {
+		const cleanedOptions = filterSerializableData(options);
 		try {
 			// Validate and filter options
-			const cleanedOptions = filterSerializableData(options);
 			if (!cleanedOptions) {
 				alert("Invalid data in accordion options. Please check your input.");
 				return;
@@ -134,7 +167,7 @@ const AccordionEditor = () => {
 				body: JSON.stringify({
 					id: currentAccordion?.id || null,
 					title, // Use the title from state
-					content: qs.stringify(cleanedOptions, { encode: true }),
+					content: cleanedOptions,
 					status,
 				}),
 			});
@@ -256,12 +289,17 @@ const AccordionEditor = () => {
 
 	// Fetch the updated list of accordions
 	const fetchUpdatedAccordionList = async () => {
+		setCurrentPage(1);
+		setPostStatus("publish");
+		const listState = `/list?status=publish&page=1`;
 		try {
-			const response = await fetch(`${aspectAccordionsData?.apiUrl}/list`, {
+			const response = await fetch(`${aspectAccordionsData?.apiUrl}${listState}`, {
 				headers: { "X-WP-Nonce": aspectAccordionsData?.nonce },
 			});
+			var dataX = [];
 			const data = await response.json();
-			setAccordions(data.accordions);
+			dataX = JSON.parse(data);
+			setAccordions(dataX.accordions);
 		} catch (err) {
 			console.error("Error fetching accordion list:", err);
 		}
@@ -339,6 +377,39 @@ const AccordionEditor = () => {
 		setTitle("");
 	};
 
+	const handleBulkUpdate = async (selectedIds, status) => {
+		try {
+			const response = await fetch(
+				`${aspectAccordionsData?.apiUrl}/bulk-update`,
+				{
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						"X-WP-Nonce": aspectAccordionsData?.nonce,
+					},
+					body: JSON.stringify({ ids: selectedIds, status }),
+				}
+			);
+
+			const result = await response.json();
+
+			if (result.success) {
+				await fetchUpdatedAccordionList();
+				setCurrentAccordion(null);
+				setOptions(null);
+				setTitle("");
+				setSelectedAccordions([]);
+				// alert(result.message);
+				// Refresh the accordion list if needed
+			} else {
+				console.error("Error:", result);
+			}
+		} catch (error) {
+			console.error("Request failed:", error);
+		}
+	};
+
+
 	const addItem = (index) => {
 		setOptions((prev) => ({
 			...prev,
@@ -368,8 +439,8 @@ const AccordionEditor = () => {
 	};
 
 	const handlePageChange = (page) => {
-    setCurrentPage(page)
-  }
+		setCurrentPage(page);
+	};
 
 	return (
 		<>
@@ -386,6 +457,9 @@ const AccordionEditor = () => {
 						startEditing={startEditing}
 						startDeleting={startDeleting}
 						startCopying={startCopying}
+						selectedAccordions={selectedAccordions}
+						setSelectedAccordions={setSelectedAccordions}
+						handleBulkUpdate={handleBulkUpdate}
 						// startQuickView={startQuickView}
 					/>
 				) : (
@@ -422,6 +496,8 @@ const AccordionEditor = () => {
 										<AccordionContent className="py-3 px-3 border-0 pb-3 bg-transparent dark:bg-transparent space-y-3">
 											<AccordionGlobalOptions
 												globalOptions={options.global}
+												isAccordion={isAccordion}
+												setIsAccordion={setIsAccordion}
 												itemsLength={options.items.length}
 												updateGlobalOption={updateGlobalOption}
 											/>
@@ -479,6 +555,11 @@ const AccordionEditor = () => {
 };
 
 export default AccordionEditor;
+
+
+
+
+
 
 
 

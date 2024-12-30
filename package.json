@@ -41,7 +41,7 @@
     "@heroicons/react": "^2.2.0",
     "@tinymce/tinymce-react": "^5.1.1",
     "@vitejs/plugin-react": "^4.3.4",
-    "aspect-ui": "^0.0.57",
+    "aspect-ui": "^0.0.58",
     "autoprefixer": "^10.4.19",
     "clsx": "^2.1.1",
     "dompurify": "^3.2.3",

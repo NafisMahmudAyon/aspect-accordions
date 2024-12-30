@@ -1,5 +1,7 @@
 export const defaultData = {
 	global: {
+		isAccordion: true,
+		isVertical: true,
 		activeItems: [],
 		multiple: false,
 		iconEnabled: true,
@@ -16,6 +18,9 @@ export const defaultData = {
 		activeHeaderClassName: "",
 		contentClassName: "",
 		accordionClassName: "",
+		tabsDefaultActive: "",
+		tabsClassName: "",
+		tabsLabelClassName: "",
 	},
 	items: [
 		{
@@ -37,6 +42,7 @@ export const defaultData = {
 			activeHeaderClassName: "",
 			contentClassName: "",
 			accordionClassName: "",
+			navigationClassName: "",
 		},
 	],
 };

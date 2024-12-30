@@ -39,7 +39,7 @@ class AspectAccordions
 
         add_action('admin_init', [$this, 'suppress_notices_on_custom_page']);
 
-        add_action('init', [$this, 'aspectAccordions_register_blocks']);
+        // add_action('init', [$this, 'aspectAccordions_register_blocks']);
     }
 
     /**

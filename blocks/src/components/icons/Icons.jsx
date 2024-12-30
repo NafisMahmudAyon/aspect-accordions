@@ -73,7 +73,6 @@ const Icons = ({ label = "Select Icon", val, update, updateIconType }) => {
 										key={i}
 										className="flex items-center flex-col text-center p-2 focus:outline-none"
 										onClick={() => {
-											console.log("name: ", icon.name);
 											update(icon.name);
 											updateIconType(iconType);
 											setOpen(false);

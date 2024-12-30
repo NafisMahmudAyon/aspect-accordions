@@ -1,34 +1,59 @@
-import Select from "./Select";
-import TailwindInput from "./TailwindInput";
-import Icons from "./icons/Icons";
 import { Switch } from "aspect-ui/Switch";
 import { TabContent, TabItem, TabList, Tabs } from "aspect-ui/Tabs";
 import React from "react";
+import Select from "./Select";
+import TailwindInput from "./TailwindInput";
+import Icons from "./icons/Icons";
 const AccordionGlobalOptions = ({
 	globalOptions,
+	isAccordion = true,
+	setIsAccordion,
 	itemsLength,
 	updateGlobalOption,
 }) => {
-	let activeTab = "item-1";
-	console.log(activeTab);
 	return (
 		<>
+			{/* checkbox for isAccordion is true then Accordion else Tabs */}
+			<div>
+				<label>
+					<input
+						type="checkbox"
+						checked={isAccordion ?? true}
+						onChange={() => {
+							setIsAccordion(true);
+							updateGlobalOption("isAccordion", true);
+						}}
+					/>
+					Accordion
+				</label>
+				<label>
+					<input
+						type="checkbox"
+						checked={!isAccordion ?? true}
+						onChange={() => {
+							setIsAccordion(false);
+							updateGlobalOption("isAccordion", false);
+						}}
+					/>
+					Tabs
+				</label>
+			</div>
 			<Tabs defaultActive="item-1">
 				<TabList className="px-3">
 					<TabItem
-						value="item-1"
+						id="item-1"
 						activeClassName="!bg-primary-900 !text-white dark:!bg-primary-900 dark:!text-white"
 						className="px-4 py-2 rounded-md bg-gray-200 text-gray-600 dark:bg-gray-200 dark:text-gray-600">
 						Options
 					</TabItem>
 					<TabItem
-						value="item-2"
+						id="item-2"
 						activeClassName="!bg-primary-900 !text-white dark:!bg-primary-900 dark:!text-white"
 						className="px-4 py-2 rounded-md bg-gray-200 text-gray-600 dark:bg-gray-200 dark:text-gray-600">
 						Style
 					</TabItem>
 				</TabList>
-				<TabContent value="item-1" className="space-y-3 py-3 px-3">
+				<TabContent id="item-1" className="space-y-3 py-3 px-3">
 					<Switch
 						checked={globalOptions?.iconEnabled}
 						onChange={(value) => updateGlobalOption("iconEnabled", value)}
@@ -106,7 +131,7 @@ const AccordionGlobalOptions = ({
 						</div>
 					</div>
 				</TabContent>
-				<TabContent value="item-2" className="space-y-3 py-3 px-3">
+				<TabContent id="item-2" className="space-y-3 py-3 px-3">
 					<TailwindInput
 						val={globalOptions?.accordionClassName}
 						update={(value) => updateGlobalOption("accordionClassName", value)}
@@ -148,3 +173,4 @@ const AccordionGlobalOptions = ({
 };
 
 export default AccordionGlobalOptions;
+

@@ -13,7 +13,6 @@ const MarkdownEditor = ({ value, onChange }) => {
     // console.log("sanitizedValue: ",sanitizedValue);
     // console.log("stringifyValue: ",JSON.stringify(sanitizedValue));
 		setEditorValue(value);
-    console.log("markdown: ",value)
 		onChange(value); // Notify the parent component of the sanitized content
 	};
 

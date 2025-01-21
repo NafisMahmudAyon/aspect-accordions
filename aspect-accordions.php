@@ -53,7 +53,7 @@ class AspectAccordions
         // Enqueue Render Script
         wp_enqueue_script(
             'aspect-accordions-render',
-            plugins_url('/assets/js/shortcode.bundle.js', __FILE__),
+            plugins_url('/assets/js/build/shortcode.bundle.js', __FILE__),
             ['react', 'react-dom', 'wp-element'], // Dependencies
             aspect_accordions_version,
             true

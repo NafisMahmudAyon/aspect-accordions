@@ -1,5 +1,5 @@
-import RichTextViewer from "@components/RichTextViewer";
-import IconSelector from "@icons/IconSelector";
+import RichTextViewer from "./RichTextViewer";
+import IconSelector from "./icons/IconSelector";
 import {
 	Accordion,
 	AccordionContent,

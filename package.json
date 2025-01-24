@@ -17,8 +17,7 @@
     "build",
     "aspect-accordions.php",
     "includes",
-    "assets",
-    "src"
+    "assets"
   ],
   "keywords": [],
   "author": "Nafis Mahmud Ayon <nafismahmudayon@gmail.com>",

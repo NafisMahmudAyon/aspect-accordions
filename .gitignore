@@ -40,3 +40,5 @@ next-env.d.ts
 /lib
 
 /blocks/node_modules
+
+.babelrc

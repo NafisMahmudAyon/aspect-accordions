@@ -27,18 +27,18 @@ add_action('rest_api_init', function () {
     // ]);
 
     // Save accordion (create/update)
-    register_rest_route('aspect-accordions-tabs/v2', '/save', [
+    register_rest_route('aspect-accordions/v2', '/save', [
         'methods' => 'POST',
-        'callback' => 'aspect_accordions_tabs_save_accordion',
+        'callback' => 'aspect_accordions_save_accordion',
         'permission_callback' => function () {
             return current_user_can('edit_posts');
         },
     ]);
 
     // Delete accordion
-    register_rest_route('aspect-accordions-tabs/v2', '/delete/(?P<id>\d+)', [
+    register_rest_route('aspect-accordions/v2', '/delete/(?P<id>\d+)', [
         'methods' => 'DELETE',
-        'callback' => 'aspect_accordions_tabs_delete_accordion',
+        'callback' => 'aspect_accordions_delete_accordion',
         'args' => [
             'id' => [
                 'required' => true,
@@ -53,9 +53,9 @@ add_action('rest_api_init', function () {
     ]);
 
     // Duplicate accordion
-    register_rest_route('aspect-accordions-tabs/v2', '/duplicate/(?P<id>\d+)', [
+    register_rest_route('aspect-accordions/v2', '/duplicate/(?P<id>\d+)', [
         'methods' => 'POST',
-        'callback' => 'aspect_accordions_tabs_duplicate_accordion',
+        'callback' => 'aspect_accordions_duplicate_accordion',
         'args' => [
             'id' => [
                 'required' => true,
@@ -70,9 +70,9 @@ add_action('rest_api_init', function () {
     ]);
 
     // Quick view accordion
-    register_rest_route('aspect-accordions-tabs/v2', '/view/(?P<id>\d+)', [
+    register_rest_route('aspect-accordions/v2', '/view/(?P<id>\d+)', [
         'methods' => 'GET',
-        'callback' => 'aspect_accordions_tabs_quick_view_accordion',
+        'callback' => 'aspect_accordions_quick_view_accordion',
         'args' => [
             'id' => [
                 'required' => true,
@@ -86,9 +86,9 @@ add_action('rest_api_init', function () {
         },
     ]);
     // Register the route for changing post status
-    register_rest_route('aspect-accordions-tabs/v2', '/status/(?P<id>\d+)', [
+    register_rest_route('aspect-accordions/v2', '/status/(?P<id>\d+)', [
         'methods' => 'POST',
-        'callback' => 'aspect_accordions_tabs_change_accordion_status',
+        'callback' => 'aspect_accordions_change_accordion_status',
         'args' => [
             'id' => [
                 'required' => true,
@@ -108,9 +108,9 @@ add_action('rest_api_init', function () {
         },
     ]);
 
-    register_rest_route('aspect-accordions-tabs/v2', '/bulk-update', [
+    register_rest_route('aspect-accordions/v2', '/bulk-update', [
         'methods' => 'POST',
-        'callback' => 'aspect_accordions_tabs_handle_bulk_update',
+        'callback' => 'aspect_accordions_handle_bulk_update',
         'permission_callback' => function () {
             return current_user_can('edit_posts');
         },
@@ -134,7 +134,7 @@ add_action('rest_api_init', function () {
 //     }, $posts);
 // }
 
-function aspect_accordions_tabs_get_accordions($request) {
+function aspect_accordions_get_accordions($request) {
     // Get pagination parameters
     $page = (int) $request->get_param('page') ?: 1;
     $per_page = (int) $request->get_param('per_page') ?: 10;
@@ -173,7 +173,7 @@ function aspect_accordions_tabs_get_accordions($request) {
     return rest_ensure_response($response);
 }
 
-function aspect_accordions_tabs_get_accordions_by_status($request) {
+function aspect_accordions_get_accordions_by_status($request) {
     // Get parameters from the request
     $status = $request->get_param('status') ?: 'publish';
     $page = (int) $request->get_param('page') ?: 1;
@@ -214,7 +214,7 @@ function aspect_accordions_tabs_get_accordions_by_status($request) {
 
     return json_encode($response);
 }
-function aspect_accordions_tabs_get_draft_accordions() {
+function aspect_accordions_get_draft_accordions() {
     $posts = get_posts([
         'post_type' => 'aspect_accordions',
         'post_status' => 'draft',
@@ -229,7 +229,7 @@ function aspect_accordions_tabs_get_draft_accordions() {
         ];
     }, $posts);
 }
-function aspect_accordions_tabs_get_trash_accordions() {
+function aspect_accordions_get_trash_accordions() {
     $posts = get_posts([
         'post_type' => 'aspect_accordions',
         'post_status' => 'trash',
@@ -291,7 +291,7 @@ function aspect_accordions_tabs_get_trash_accordions() {
 // }
 
 
-function aspect_accordions_tabs_save_accordion($request) {
+function aspect_accordions_save_accordion($request) {
     $params = $request->get_json_params();
 
     // Debug logs to inspect received data
@@ -341,7 +341,7 @@ function aspect_accordions_tabs_save_accordion($request) {
 
 
 // Delete accordion
-function aspect_accordions_tabs_delete_accordion($request) {
+function aspect_accordions_delete_accordion($request) {
     $id = intval($request['id']);
 
     if (get_post_type($id) !== 'aspect_accordions') {
@@ -357,7 +357,7 @@ function aspect_accordions_tabs_delete_accordion($request) {
 }
 
 // Duplicate accordion
-function aspect_accordions_tabs_duplicate_accordion($request) {
+function aspect_accordions_duplicate_accordion($request) {
     $id = intval($request['id']);
     $post = get_post($id);
 
@@ -381,7 +381,7 @@ function aspect_accordions_tabs_duplicate_accordion($request) {
 }
 
 // Quick view accordion
-function aspect_accordions_tabs_quick_view_accordion($request) {
+function aspect_accordions_quick_view_accordion($request) {
     $id = intval($request['id']);
     $post = get_post($id);
 
@@ -397,7 +397,7 @@ function aspect_accordions_tabs_quick_view_accordion($request) {
 }
 
 // Change the post status of an accordion
-function aspect_accordions_tabs_change_accordion_status($request) {
+function aspect_accordions_change_accordion_status($request) {
     $id = intval($request['id']);
     $status = sanitize_text_field($request['status']);
 
@@ -430,7 +430,7 @@ function aspect_accordions_tabs_change_accordion_status($request) {
     ];
 }
 
-function aspect_accordions_tabs_handle_bulk_update($request) {
+function aspect_accordions_handle_bulk_update($request) {
     $params = $request->get_json_params();
 
     // error_log(print_r($params, true));

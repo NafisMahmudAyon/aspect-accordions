@@ -31,6 +31,8 @@ const AccordionEditor = () => {
 		setIsAccordion(options?.global?.isAccordion ?? true);
 	}, [options?.global]);
 
+	console.log(aspectAccordionsData);
+
 	useEffect(() => {
 		const listState = `/list?status=${postStatus}&page=${currentPage}`;
 		const fetchAccordions = async () => {

@@ -45,13 +45,6 @@ Here, you can:
 
 ---
 
-### Development and Source Code
-
-The source code for this plugin is open source and available on GitHub:  
-[GitHub Repository](https://github.com/NafisMahmudAyon/aspect-accordions)
-
----
-
 ### Changelog
 
 #### Version 0.0.1  

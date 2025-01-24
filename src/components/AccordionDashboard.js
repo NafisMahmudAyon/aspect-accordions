@@ -239,7 +239,7 @@ const AccordionDashboard = ({
 													<ModalAction>
 														<EyeIcon className="size-5" />
 													</ModalAction>
-													<ModalContent className="p-4 min-w-[600px] max-h-[600px] overflow-y-auto light-scrollbar">
+													<ModalContent className="p-4 min-w-[600px] max-h-[600px] bg-slate-200 overflow-y-auto light-scrollbar">
 														<AccordionPreview
 															globalOptions={globalOptions}
 															items={items}

@@ -3,7 +3,7 @@
 Plugin Name: Aspect Accordions - With Tailwind
 Plugin URI: https://nafisbd.com
 Description: Fully responsive and mobile ready accordion plugin for WordPress.
-Version: 0.0.1
+Version: 0.0.4
 Author: nafismahmudayon
 Author URI: http://nafisbd.com
 Text Domain: aspect-accordions

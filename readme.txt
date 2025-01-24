@@ -1,11 +1,11 @@
-### Aspect Accordions - With Tailwind
-**Contributors:** nafismahmudayon  
-**Tags:** accordion, FAQ, tabs, content builder  
-**Requires at least:** 3.8  
-**Tested up to:** 6.7  
-**Stable tag:** 0.0.1  
-**License:** GPLv2 or later  
-**License URI:** [http://www.gnu.org/licenses/gpl-2.0.html](http://www.gnu.org/licenses/gpl-2.0.html)  
+=== Aspect Accordions - With Tailwind ===
+Contributors:      nafismahmudayon
+Tags:              Accordion, FAQ, tabs, content builder  
+Tested up to:      6.7
+Stable tag:        0.0.4
+Requires PHP:      7.0
+License:           GPL-2.0-or-later
+License URI:       [https://www.gnu.org/licenses/gpl-2.0.html](https://www.gnu.org/licenses/gpl-2.0.html)
 
 Effortlessly create stunning accordions, FAQs, and tabs with shortcodes. Display them anywhere—posts, pages, widgets, or page builder elements.
 

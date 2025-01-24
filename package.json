@@ -1,6 +1,6 @@
 {
   "name": "aspect-accordions",
-  "version": "0.0.1",
+  "version": "0.0.4",
   "description": "Fully responsive and mobile ready accordion plugin for WordPress.",
   "main": "index.js",
   "scripts": {

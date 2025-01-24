@@ -28,7 +28,7 @@ With an intuitive builder, customizing the look and feel has never been easier. 
    Add your accordion or tab layouts anywhere on your site using shortcodes.  
 4. **Seamless Page Builder Support:**  
    Integrate with popular page builders for enhanced flexibility.  
-
+   
 ---
 
 ### Builder Interface

@@ -1,0 +1,15 @@
+*.sql
+*.tar.gz
+*.zip
+.git
+.github
+.gitignore
+.babelrc
+
+package.json
+package-lock.json
+
+blocks
+dist
+
+tailwind.config.js

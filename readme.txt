@@ -7,11 +7,9 @@
 **License:** GPLv2 or later  
 **License URI:** [http://www.gnu.org/licenses/gpl-2.0.html](http://www.gnu.org/licenses/gpl-2.0.html)  
 
-Create stunning accordions, FAQs, tabs, and tabbed content effortlessly using shortcodes. Display them anywhere on your site—posts, pages, widgets, or page builder elements.
+Effortlessly create stunning accordions, FAQs, and tabs with shortcodes. Display them anywhere—posts, pages, widgets, or page builder elements.
 
----
-
-### Description
+== Description ==
 
 **Aspect Accordions** is a powerful and user-friendly plugin for creating dynamic accordion layouts, FAQ sections, tabs, and tabbed content. Ideal for use cases such as:  
 - Frequently Asked Questions (FAQs)  
